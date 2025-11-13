@@ -3,6 +3,8 @@
 <html>
 <head>
     <title>Volando.uy | 404</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
@@ -15,7 +17,7 @@
             ¡Error!
         </h1>
         <p class="text-lg mb-6">
-            ${error}
+            ${error ? error : 'Error al cargar la página.'}
         </p>
         <a href="${pageContext.request.contextPath}/home" class="hover:bg-[var(--azul-claro)]  !text-white p-4 rounded-lg duration-400 bg-[var(--azul-oscuro)]">Volver al Inicio</a>
     </div>

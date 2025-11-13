@@ -38,8 +38,6 @@ public class PerfilServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         String nickname = request.getParameter("nickname");
 
-        System.out.println(">>> PerfilServlet: nickname = " + nickname);
-
         if (nickname == null || nickname.isEmpty()) {
             request.setAttribute("error", "Error al cargar el perfil. Se necesita un nickname.");
             request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
@@ -65,14 +63,22 @@ public class PerfilServlet extends HttpServlet {
             }
 
             boolean modificar = false;
+            boolean sigue = false;
             if (session != null && session.getAttribute("usuarioNickname") != null && session.getAttribute("usuarioTipo") !=null){
                 String userNickname = (String) session.getAttribute("usuarioNickname");
+                DtUsuario user = sistema.getUsuario(userNickname);
+                sigue = user.sigueA(usuario.getNickname());
+                System.out.println(sigue);
                 if (userNickname.equals(nickname)) {
                     modificar = true;
                 }
             }
 
-            DtAerolinea aerolinea = sistema.getAerolinea(nickname);
+            DtAerolinea aerolinea = null;
+            try{
+                aerolinea = sistema.getAerolinea(nickname);
+            }  catch (Exception ignored) {}
+
             if (aerolinea != null) {
                 request.setAttribute("aerolinea", aerolinea);
                 request.setAttribute("usuarioTipoPerfil","aerolinea");
@@ -87,6 +93,7 @@ public class PerfilServlet extends HttpServlet {
             request.setAttribute("usuarioImagenPerfil", usuario.getUrlImage());
             request.setAttribute("usuarioPerfil", usuario);
             request.setAttribute("modificar", modificar);
+            request.setAttribute("sigue",sigue);
 
             request.getRequestDispatcher("/WEB-INF/jsp/perfil/perfil.jsp").forward(request, response);
         } catch (Exception e) {

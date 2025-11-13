@@ -14,21 +14,44 @@
 
 <body>
 
+<c:set var="usuarioNickname" value="${sessionScope.usuarioNickname}"/>
+
 <jsp:include page="../components/header.jsp"/>
 
 <main class="flex flex-col mt-5 bg-white mx-auto w-3/4 p-5 rounded shadow">
 
     <c:if test="${not empty error}">
         <div class="text-red-500 text-lg my-2 text-center justify-center">
-            ${error}
+                ${error}
         </div>
     </c:if>
-   <c:if test="${not empty usuarioPerfil}">
+    <c:if test="${not empty usuarioPerfil}">
         <div class="w-full flex items-center justify-between mb-3">
             <h3 class="text-3xl text-black font-bold">Mi perfil</h3>
             <c:if test="${modificar == true}">
-            <button id="modificarButton"><i
-                    class="text-3xl fa fa-edit text-green-500 cursor-pointer hover:text-green-700"></i></button>
+                <button id="modificarButton"><i
+                        class="text-3xl fa fa-edit text-green-500 cursor-pointer hover:text-green-700"></i></button>
+            </c:if>
+
+            <c:if test="${usuarioNickname != null && modificar != true && sigue == false}">
+                <form action="${pageContext.request.contextPath}/seguir?nickname=${usuarioPerfil.nickname}" method="post">
+                <button
+                        type="submit"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Seguir
+                </button>
+                </form>
+            </c:if>
+
+            <c:if test="${usuarioNickname != null && modificar != true && sigue == true}">
+                <form action="${pageContext.request.contextPath}/dejar-de-seguir?nickname=${usuarioPerfil.nickname}" method="post">
+                    <button
+                            onclick="location.href='${pageContext.request.contextPath}/}'"
+                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Dejar de seguir
+                    </button>
+                </form>
+
             </c:if>
         </div>
         <!-- Error global si hay -->
@@ -105,13 +128,14 @@
                                        value="${cliente.nacionalidad}"/>
                             </div>
 
-                            <div class="flex  space-x-2">
+                            <div class="flex  space-x-2 items-center">
                                 <div class="flex space-x-2">
                                     <span><i class="fa fa-passport"></i></span>
                                     <label for="tipoDocumento">Tipo de documento:</label>
                                 </div>
 
-                                <select name="tipoDocumento" aria-label="Seleccione tipo de documento *" readonly
+                                <select name="tipoDocumento" aria-label="Seleccione tipo de documento *" disabled
+                                        id="selectTipoDocumento"
                                         class="flex-grow outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100"
                                 >
                                     <option value="CÉDULA DE IDENTIDAD" ${cliente.tipoDocumento == 'CEDULA' ? 'selected' : ''}>
@@ -142,21 +166,21 @@
                             </div>
 
                             <c:if test="${modificar == true}">
-                            <div class="flex space-x-3">
-                                <button type="button"
-                                        onclick="window.location.href='${pageContext.request.contextPath}/reservas/ver'"
-                                        class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
-                                    Ver mis reservas
-                                    <i class="fa fa-arrow-right ml-2"></i>
-                                </button>
+                                <div class="flex space-x-3">
+                                    <button type="button"
+                                            onclick="window.location.href='${pageContext.request.contextPath}/reservas/ver'"
+                                            class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
+                                        Ver mis reservas
+                                        <i class="fa fa-arrow-right ml-2"></i>
+                                    </button>
 
-                                <button type="button"
-                                        onclick="window.location.href='${pageContext.request.contextPath}/paquete/ver'"
-                                        class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
-                                    Ver mis paquetes
-                                    <i class="fa fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
+                                    <button type="button"
+                                            onclick="window.location.href='${pageContext.request.contextPath}/paquete/ver'"
+                                            class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
+                                        Ver mis paquetes
+                                        <i class="fa fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
                             </c:if>
 
 
@@ -167,7 +191,8 @@
                                     <span><i class="fa fa-comment"></i></span>
                                     <label for="descripcion">Descripción:</label>
                                 </div>
-                                <input type="text" class="flex-1 bg-transparent break-words truncate max-w-full" id="descripcion" name="descripcion"
+                                <input type="text" class="flex-1 bg-transparent break-words truncate max-w-full"
+                                       id="descripcion" name="descripcion"
                                        readonly
                                        value="${aerolinea.descripcion}"/>
                             </div>
@@ -177,7 +202,8 @@
                                     <span><i class="fa fa-globe"></i></span>
                                     <label for="linkWeb">Link web:</label>
                                 </div>
-                                <input type="text" class="flex-1 bg-transparent break-words truncate max-w-full" id="linkWeb" name="linkWeb" readonly
+                                <input type="text" class="flex-1 bg-transparent break-words truncate max-w-full"
+                                       id="linkWeb" name="linkWeb" readonly
                                        value="${aerolinea.linkWeb ? aerolinea.linkWeb : '-'}"/>
                             </div>
 
@@ -191,28 +217,28 @@
                             <c:if test="${modificar == true}">
 
 
-                            <div class="flex space-x-3">
-                                <button type="button"
-                                        onclick="window.location.href='${pageContext.request.contextPath}/reservas/ver'"
-                                        class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
-                                    Ver mis reservas
-                                    <i class="fa fa-arrow-right ml-2"></i>
-                                </button>
+                                <div class="flex space-x-3">
+                                    <button type="button"
+                                            onclick="window.location.href='${pageContext.request.contextPath}/reservas/ver'"
+                                            class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
+                                        Ver mis reservas
+                                        <i class="fa fa-arrow-right ml-2"></i>
+                                    </button>
 
-                                <button type="button"
-                                        onclick="window.location.href='${pageContext.request.contextPath}/paquete/ver'"
-                                        class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
-                                    Ver mis paquetes
-                                    <i class="fa fa-arrow-right ml-2"></i>
-                                </button>
+                                    <button type="button"
+                                            onclick="window.location.href='${pageContext.request.contextPath}/paquete/ver'"
+                                            class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
+                                        Ver mis paquetes
+                                        <i class="fa fa-arrow-right ml-2"></i>
+                                    </button>
 
-                                <button type="button"
-                                        onclick="window.location.href='${pageContext.request.contextPath}/ruta-de-vuelo/ver'"
-                                        class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
-                                    Ver mis rutas
-                                    <i class="fa fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
+                                    <button type="button"
+                                            onclick="window.location.href='${pageContext.request.contextPath}/ruta-de-vuelo/ver'"
+                                            class="!mt-5 hover:bg-[var(--azul-claro)] w-48 text-white py-2 rounded-lg duration-400 bg-[var(--azul-oscuro)]">
+                                        Ver mis rutas
+                                        <i class="fa fa-arrow-right ml-2"></i>
+                                    </button>
+                                </div>
                             </c:if>
                         </c:when>
 
@@ -220,56 +246,45 @@
                 </div>
             </div>
         </form>
-       <div class="flex flex-col md:flex-row justify-around items-center gap-4">
-           <!-- Lista de seguidos -->
-           <div class="flex flex-col items-start w-full md:w-1/2 md:flex-row md:items-center gap-2">
-               <h3 class="whitespace-nowrap">Lista de seguidos:</h3>
-               <div class="flex-grow max-w-full">
-                   <select
-                           class="w-full truncate outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100"
-                   >
-                       <option class="whitespace-nowrap" value="" disabled selected>
-                           Seleccione un seguido *
-                       </option>
+        <c:if test="${modificar == true}">
+           <div class="flex flex-col w-full space-y-2">
+               <label>Lista de seguidos:</label>
+               <div class="flex w-full space-x-3">
+                   <select class="flex-1 border border-gray-300 rounded px-2 py-1" id="selectSeguidos">
+                       <option value="" disabled selected>Seleccione un seguido</option>
                        <c:forEach var="seguido" items="${listaSeguidos}">
-                           <option value="${seguido.nickname}" class="truncate">
-                                   ${seguido.nickname} - ${seguido.email}
-                               <button onclick="location.href='${pageContext.request.contextPath}/dejar-de-seguir?nickname=${seguido.nickname}'">
-                                   <i class="fa fa-user-minus text-red-500 ml-2"></i>
-                               </button>
-                           </option>
+                           <option value="${seguido.nickname}">${seguido.nickname} - ${seguido.nombre}</option>
                        </c:forEach>
                    </select>
+                   <button id="verPerfilSeguidoBtn"
+                           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                       <i class="fa fa-eye"></i>
+                   </button>
                </div>
-               <button>
 
-               </button>
-           </div>
-
-           <!-- Lista de seguidores -->
-           <div class="flex flex-col items-start w-full md:w-1/2 md:flex-row md:items-center gap-2">
-               <h3 class="whitespace-nowrap">Lista de seguidores:</h3>
-               <div class="flex-grow max-w-full">
-                   <select
-                           class="w-full truncate outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100"
-                   >
-                       <option class="whitespace-nowrap" value="" disabled selected>
-                           Seleccione un seguidor *
-                       </option>
+               <label>Lista de seguidores:</label>
+               <div class="flex w-full space-x-3">
+                   <select class="flex-1 border border-gray-300 rounded px-2 py-1" id="selectSeguidores">
+                       <option value="" disabled selected>Seleccione un seguidor</option>
                        <c:forEach var="seguidor" items="${listaSeguidores}">
-                           <option value="${seguidor.nickname}" class="truncate">
-                                   ${seguidor.nickname} - ${seguidor.email}
-                           </option>
+                           <option value="${seguidor.nickname}">${seguidor.nickname} - ${seguidor.nombre}</option>
                        </c:forEach>
                    </select>
+                   <button id="verPerfilSeguidorBtn"
+                           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                       <i class="fa fa-eye"></i>
+                   </button>
                </div>
            </div>
-       </div>
+        </c:if>
+
     </c:if>
 
 </main>
 
-<script defer>
+<script>
+
+
     const formModificar = document.getElementById("formModificar");
     const modificarButton = document.getElementById("modificarButton");
     const seleccionarImagenContainer = document.getElementById("seleccionarImagenContainer");
@@ -280,8 +295,10 @@
     const buttonGuardarContainer = buttonModificarClienteContainer || buttonModificarAerolineaContainer;
     const errorMsg = document.getElementById("errorMsg");
     const successMsg = document.getElementById("successMsg");
+    const selectTipoDocumento = document.getElementById("selectTipoDocumento");
 
-    inputImagen.addEventListener("change", (event) => {
+    // --- Preview de imagen ---
+    inputImagen?.addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -294,73 +311,79 @@
 
     let modificando = false;
 
-    modificarButton.addEventListener("click", () => {
+    modificarButton?.addEventListener("click", () => {
         modificando = !modificando;
 
-        if (!modificando) seleccionarImagenContainer.classList.remove('!flex');
-        else seleccionarImagenContainer.classList.add('!flex');
-
-        if (!modificando) buttonGuardarContainer.classList.remove('!flex');
-        else buttonGuardarContainer.classList.add('!flex');
+        seleccionarImagenContainer?.classList.toggle("!flex", modificando);
+        buttonGuardarContainer?.classList.toggle("!flex", modificando);
 
         const inputs = formModificar.querySelectorAll("input, select");
         const spans = formModificar.querySelectorAll("span");
 
+        if (selectTipoDocumento) {
+            selectTipoDocumento.disabled = false;
+        }
+
         inputs.forEach(input => {
             input.readOnly = !modificando;
-            if (modificando) {
-                input.classList.add("bg-green-200", "indent-1");
-            } else {
-                input.classList.remove("bg-green-200", "indent-1");
-            }
+            input.classList.toggle("bg-green-200", modificando);
+            input.classList.toggle("indent-1", modificando);
         });
 
         spans.forEach(span => {
-            if (modificando) {
-                span.classList.add("text-green-600");
-            } else {
-                span.classList.remove("text-green-600");
-            }
-        });
-
-        formModificar.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            if (modificando) {
-                const formData = new FormData(formModificar);
-
-                const response = await fetch('${pageContext.request.contextPath}perfil?nickname=${usuario.nickname}', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    modificando = false;
-                    setTimeout(() => {
-                        successMsg.classList.add('!flex');
-                        seleccionarImagenContainer.classList.remove('!flex');
-                        buttonGuardarContainer.classList.remove('!flex');
-
-                        inputs.forEach(input => {
-                            input.readOnly = true;
-                            input.classList.remove("bg-green-200", "indent-1");
-                        });
-
-                        spans.forEach(span => {
-                            span.classList.remove("text-green-600");
-                        });
-                    }, 1500);
-                    window.location.reload();
-                } else {
-                    const errorText = await response.text();
-                    errorMsg.textContent = errorText || 'Error al actualizar el perfil.';
-                    errorMsg.classList.add('!flex');
-                }
-            } else {
-                errorMsg.textContent = 'Debes realizar modificaciones antes de guardar.';
-                errorMsg.classList.add('!flex');
-            }
+            span.classList.toggle("text-green-600", modificando);
         });
     });
+
+    formModificar?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!modificando) {
+            errorMsg.textContent = 'Debes realizar modificaciones antes de guardar.';
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+
+        const formData = new FormData(formModificar);
+
+        try {
+            const response = await fetch(`${contextPath}/perfil?nickname=${usuarioNickname}`, {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                successMsg.classList.remove("hidden");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                const errorText = await response.text();
+                errorMsg.textContent = errorText || "Error al actualizar el perfil.";
+                errorMsg.classList.remove("hidden");
+            }
+        } catch (error) {
+            errorMsg.textContent = "Error en la conexión con el servidor.";
+            errorMsg.classList.remove("hidden");
+        }
+    });
+
+    const botonSeguido = document.getElementById("verPerfilSeguidoBtn");
+    const botonSeguidor = document.getElementById("verPerfilSeguidorBtn");
+    const selectSeguidos = document.getElementById("selectSeguidos");
+    const selectSeguidores = document.getElementById("selectSeguidores");
+
+    botonSeguido.addEventListener("click", () => {
+        const nickname = selectSeguidos.value;
+        if (nickname) window.location.href = `${pageContext.request.contextPath}/perfil?nickname=` + nickname;
+        else alert("Seleccione un usuario primero.");
+    });
+
+    botonSeguidor.addEventListener("click", () => {
+        const nickname = selectSeguidores.value;
+        if (nickname) window.location.href = `${pageContext.request.contextPath}/perfil?nickname=` + nickname;
+        else alert("Seleccione un usuario primero.");
+    });
 </script>
+
+
 </body>
 </html>
