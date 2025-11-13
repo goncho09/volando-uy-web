@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 @MultipartConfig
 @WebServlet(name = "RegistrarUsuario", urlPatterns = {"/register","/signup","/registrar"})
@@ -100,7 +101,7 @@ public class RegistrarUsuarioServlet extends HttpServlet {
             String fotoPerfil = imagenGuardada.getName();
 
             HttpSession session = request.getSession(true);
-            session.setAttribute("datosUsuario", new DtUsuario(nickname, email, nombre, password, fotoPerfil));
+            session.setAttribute("datosUsuario", new DtUsuario(nickname,nombre, email, password, fotoPerfil,new ArrayList<>(), new ArrayList<>()));
             session.setAttribute("tipoUsuario", tipoUsuario);
 
             response.setStatus(HttpServletResponse.SC_OK);

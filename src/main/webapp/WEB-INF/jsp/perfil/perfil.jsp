@@ -1,5 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -8,29 +8,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volando.uy | Perfil</title>
 
-    <!-- Librerías Header -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
 </head>
 
 <body>
 
-<c:set var="usuario" value="${sessionScope.usuario}"/>
-<c:set var="usuarioTipo" value="${sessionScope.usuarioTipo}"/>
-
-
 <jsp:include page="../components/header.jsp"/>
 
 <main class="flex flex-col mt-5 bg-white mx-auto w-3/4 p-5 rounded shadow">
 
-    <c:if test="${not empty usuario}">
+    <c:if test="${not empty error}">
+        <div class="text-red-500 text-lg my-2 text-center justify-center">
+            ${error}
+        </div>
+    </c:if>
+   <c:if test="${not empty usuarioPerfil}">
         <div class="w-full flex items-center justify-between mb-3">
             <h3 class="text-3xl text-black font-bold">Mi perfil</h3>
+            <c:if test="${modificar == true}">
             <button id="modificarButton"><i
                     class="text-3xl fa fa-edit text-green-500 cursor-pointer hover:text-green-700"></i></button>
+            </c:if>
         </div>
         <!-- Error global si hay -->
         <div class="text-red-500 text-lg my-2 hidden text-center justify-center" id="errorMsg"></div>
@@ -44,7 +43,7 @@
             <section class="flex flex-col rounded shadow p-4 items-center">
                 <div class="flex flex-col items-center space-y-2">
                     <img id="previewImagen"
-                         src="${empty usuarioImagen ? pageContext.request.contextPath + '/assets/userDefault.png' : usuarioImagen}"
+                         src="${empty usuarioImagenPerfil ? pageContext.request.contextPath + '/assets/userDefault.png' : usuarioImagenPerfil}"
                          alt="Foto de perfil"
                          class="rounded-full max-w-xs w-48 h-auto object-cover"/>
                     <div class="hidden space-x-2" id="seleccionarImagenContainer">
@@ -57,8 +56,8 @@
                 </div>
 
                 <div class="flex flex-col mt-3 space-y-2 text-black text-center">
-                    <p>${usuario.nickname}</p>
-                    <p>${usuario.email}</p>
+                    <p>${usuarioPerfil.nickname}</p>
+                    <p>${usuarioPerfil.email}</p>
                 </div>
             </section>
 
@@ -72,10 +71,10 @@
                             <label for="nombre">Nombre:</label>
                         </div>
                         <input type="text" class="flex-1 bg-transparent"
-                               id="nombre" name="nombre" readonly value="${usuario.nombre}"/>
+                               id="nombre" name="nombre" readonly value="${usuarioPerfil.nombre}"/>
                     </div>
                     <c:choose>
-                        <c:when test="${usuarioTipo == 'cliente' && cliente != null}">
+                        <c:when test="${usuarioTipoPerfil == 'cliente' && cliente != null}">
 
                             <div class="flex space-x-2">
                                 <div class="flex space-x-2">
@@ -142,6 +141,7 @@
 
                             </div>
 
+                            <c:if test="${modificar == true}">
                             <div class="flex space-x-3">
                                 <button type="button"
                                         onclick="window.location.href='${pageContext.request.contextPath}/reservas/ver'"
@@ -157,16 +157,17 @@
                                     <i class="fa fa-arrow-right ml-2"></i>
                                 </button>
                             </div>
+                            </c:if>
 
 
                         </c:when>
-                        <c:when test="${usuarioTipo == 'aerolinea' && aerolinea != null}">
+                        <c:when test="${usuarioTipoPerfil == 'aerolinea' && aerolinea != null}">
                             <div class="flex  space-x-2">
                                 <div class="flex space-x-2">
                                     <span><i class="fa fa-comment"></i></span>
                                     <label for="descripcion">Descripción:</label>
                                 </div>
-                                <input type="text" class="flex-1 bg-transparent" id="descripcion" name="descripcion"
+                                <input type="text" class="flex-1 bg-transparent break-words truncate max-w-full" id="descripcion" name="descripcion"
                                        readonly
                                        value="${aerolinea.descripcion}"/>
                             </div>
@@ -176,8 +177,8 @@
                                     <span><i class="fa fa-globe"></i></span>
                                     <label for="linkWeb">Link web:</label>
                                 </div>
-                                <input type="text" class="flex-1 bg-transparent" id="linkWeb" name="linkWeb" readonly
-                                       value="${aerolinea.linkWeb}"/>
+                                <input type="text" class="flex-1 bg-transparent break-words truncate max-w-full" id="linkWeb" name="linkWeb" readonly
+                                       value="${aerolinea.linkWeb ? aerolinea.linkWeb : '-'}"/>
                             </div>
 
                             <div class="hidden w-full" id="buttonModificarAerolineaContainer">
@@ -187,6 +188,8 @@
                                 </button>
 
                             </div>
+                            <c:if test="${modificar == true}">
+
 
                             <div class="flex space-x-3">
                                 <button type="button"
@@ -210,20 +213,63 @@
                                     <i class="fa fa-arrow-right ml-2"></i>
                                 </button>
                             </div>
-
-
+                            </c:if>
                         </c:when>
-                        <c:otherwise>
-                            <p>Lista de usuarios</p>
-                        </c:otherwise>
+
                     </c:choose>
                 </div>
             </div>
         </form>
+       <div class="flex flex-col md:flex-row justify-around items-center gap-4">
+           <!-- Lista de seguidos -->
+           <div class="flex flex-col items-start w-full md:w-1/2 md:flex-row md:items-center gap-2">
+               <h3 class="whitespace-nowrap">Lista de seguidos:</h3>
+               <div class="flex-grow max-w-full">
+                   <select
+                           class="w-full truncate outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100"
+                   >
+                       <option class="whitespace-nowrap" value="" disabled selected>
+                           Seleccione un seguido *
+                       </option>
+                       <c:forEach var="seguido" items="${listaSeguidos}">
+                           <option value="${seguido.nickname}" class="truncate">
+                                   ${seguido.nickname} - ${seguido.email}
+                               <button onclick="location.href='${pageContext.request.contextPath}/dejar-de-seguir?nickname=${seguido.nickname}'">
+                                   <i class="fa fa-user-minus text-red-500 ml-2"></i>
+                               </button>
+                           </option>
+                       </c:forEach>
+                   </select>
+               </div>
+               <button>
+
+               </button>
+           </div>
+
+           <!-- Lista de seguidores -->
+           <div class="flex flex-col items-start w-full md:w-1/2 md:flex-row md:items-center gap-2">
+               <h3 class="whitespace-nowrap">Lista de seguidores:</h3>
+               <div class="flex-grow max-w-full">
+                   <select
+                           class="w-full truncate outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100"
+                   >
+                       <option class="whitespace-nowrap" value="" disabled selected>
+                           Seleccione un seguidor *
+                       </option>
+                       <c:forEach var="seguidor" items="${listaSeguidores}">
+                           <option value="${seguidor.nickname}" class="truncate">
+                                   ${seguidor.nickname} - ${seguidor.email}
+                           </option>
+                       </c:forEach>
+                   </select>
+               </div>
+           </div>
+       </div>
     </c:if>
+
 </main>
 
-<script>
+<script defer>
     const formModificar = document.getElementById("formModificar");
     const modificarButton = document.getElementById("modificarButton");
     const seleccionarImagenContainer = document.getElementById("seleccionarImagenContainer");
@@ -282,7 +328,7 @@
             if (modificando) {
                 const formData = new FormData(formModificar);
 
-                const response = await fetch('${pageContext.request.contextPath}/perfil', {
+                const response = await fetch('${pageContext.request.contextPath}perfil?nickname=${usuario.nickname}', {
                     method: 'POST',
                     body: formData
                 });

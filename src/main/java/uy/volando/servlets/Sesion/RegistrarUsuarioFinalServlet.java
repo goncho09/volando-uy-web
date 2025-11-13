@@ -70,7 +70,8 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
                     urlSitioWeb = "";  // Permite empty
                 }
 
-                sistema.registrarAerolinea(new DtAerolinea(dtUsuarioTemp, descripcion, urlSitioWeb));
+                sistema.registrarAerolinea(new DtAerolinea(dtUsuarioTemp.getNickname(), dtUsuarioTemp.getNombre(), dtUsuarioTemp.getEmail(),
+                        dtUsuarioTemp.getPassword(), dtUsuarioTemp.getUrlImage(), descripcion, urlSitioWeb));
 
             } else {  // Asume "cliente"
                 String apellido = request.getParameter("apellido");
@@ -123,7 +124,8 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
                     return;
                 }
 
-                sistema.registrarCliente(new DtCliente(dtUsuarioTemp, apellido, fechaNac, nacionalidad, tipoDocumento, numDocumento));
+                sistema.registrarCliente(new DtCliente(dtUsuarioTemp.getNickname(), dtUsuarioTemp.getNombre(), dtUsuarioTemp.getEmail(),
+                        dtUsuarioTemp.getPassword(), dtUsuarioTemp.getUrlImage(), apellido, fechaNac, nacionalidad, tipoDocumento, numDocumento));
             }
 
             // <-- NUEVO: Auto-login después de registrar

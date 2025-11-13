@@ -102,8 +102,8 @@ public class HomeServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(request, response);
 
         } catch (Exception e) {
-            e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request.");
+            System.out.println(e.getMessage());
             request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
         }
     }

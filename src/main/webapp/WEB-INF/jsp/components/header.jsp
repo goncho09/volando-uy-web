@@ -19,7 +19,7 @@
         <c:choose>
             <c:when test="${usuarioNickname != null}">
                 <div class="flex flex-col items-center space-x-3 md:flex-row" id="user-info">
-                    <a class="flex items-center" href="${pageContext.request.contextPath}/perfil">
+                    <a class="flex items-center" href="${pageContext.request.contextPath}/perfil?nickname=${usuarioNickname}">
                         <img src="${usuarioImagen}" class="w-12 h-12 rounded-full mr-2"
                              alt=${usuarioNickname}/>
                         <p class="m-0" id="nickname">${usuarioNickname}</p>
@@ -182,6 +182,20 @@
                             </details>
                         </li>
                     </c:if>
+                    <li>
+                        <details>
+                            <summary>Usuarios</summary>
+                            <ul class="p-2 bg-[var(--azul-oscuro)]">
+                                    <li>
+                                        <a href="${pageContext.request.contextPath}/perfil/buscar">
+                                            <p
+                                                    class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
+                                                Buscar usuario</p>
+                                        </a>
+                                    </li>
+                            </ul>
+                        </details>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -302,6 +316,21 @@
                         </details>
                     </li>
                 </c:if>
+
+                <li>
+                    <details>
+                        <summary>Usuarios</summary>
+                        <ul class="p-2 bg-[var(--azul-oscuro)]">
+                            <li>
+                                <a href="${pageContext.request.contextPath}/perfil/buscar">
+                                    <p
+                                            class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
+                                        Buscar usuario</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </details>
+                </li>
             </ul>
         </div>
     </nav>

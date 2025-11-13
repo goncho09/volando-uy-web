@@ -36,14 +36,15 @@ public class PerfilServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("usuarioTipo") == null || session.getAttribute("usuarioNickname") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
+        String nickname = request.getParameter("nickname");
+
+        System.out.println(">>> PerfilServlet: nickname = " + nickname);
+
+        if (nickname == null || nickname.isEmpty()) {
+            request.setAttribute("error", "Error al cargar el perfil. Se necesita un nickname.");
+            request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
             return;
         }
-
-        String usuarioTipo = (String) session.getAttribute("usuarioTipo");
-        String nickname = (String) session.getAttribute("usuarioNickname");
-
 
         try {
             DtUsuario usuario = sistema.getUsuario(nickname);
@@ -53,7 +54,6 @@ public class PerfilServlet extends HttpServlet {
 
             String urlImagen = usuario.getUrlImage();
             File userImg = null;
-
             if (urlImagen != null && !urlImagen.isEmpty()) {
                 userImg = new File(basePath, urlImagen);
             }
@@ -64,20 +64,35 @@ public class PerfilServlet extends HttpServlet {
                 usuario.setUrlImage(contextPath + "/pictures/users/" + urlImagen);
             }
 
-            session.setAttribute("usuarioImagen", usuario.getUrlImage());
-            session.setAttribute("usuario", usuario);
-
-            if (usuarioTipo.equals("cliente")) {
-                request.setAttribute("cliente", sistema.getCliente(nickname));
-            } else if (usuarioTipo.equals("aerolinea")) {
-                request.setAttribute("aerolinea", sistema.getAerolinea(nickname));
+            boolean modificar = false;
+            if (session != null && session.getAttribute("usuarioNickname") != null && session.getAttribute("usuarioTipo") !=null){
+                String userNickname = (String) session.getAttribute("usuarioNickname");
+                if (userNickname.equals(nickname)) {
+                    modificar = true;
+                }
             }
+
+            DtAerolinea aerolinea = sistema.getAerolinea(nickname);
+            if (aerolinea != null) {
+                request.setAttribute("aerolinea", aerolinea);
+                request.setAttribute("usuarioTipoPerfil","aerolinea");
+            } else {
+                DtCliente cliente = sistema.getCliente(nickname);
+                request.setAttribute("cliente", cliente);
+                request.setAttribute("usuarioTipoPerfil","cliente");
+            }
+
+            request.setAttribute("listaSeguidores", usuario.getSeguidores());
+            request.setAttribute("listaSeguidos",usuario.getSeguidos());
+            request.setAttribute("usuarioImagenPerfil", usuario.getUrlImage());
+            request.setAttribute("usuarioPerfil", usuario);
+            request.setAttribute("modificar", modificar);
 
             request.getRequestDispatcher("/WEB-INF/jsp/perfil/perfil.jsp").forward(request, response);
         } catch (Exception e) {
+            request.setAttribute("error", "Error al cargar el perfil.");
+            request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
             System.out.println(">>> PerfilServlet: Error = " + e.getMessage());
-            request.setAttribute("error", "Error al cargar perfil: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/jsp/perfil/perfil.jsp").forward(request, response);
         }
     }
 
@@ -142,11 +157,11 @@ public class PerfilServlet extends HttpServlet {
                     response.getWriter().write("ERROR: Tipo o número de documento inválido");
                     System.out.println(">>> PerfilServlet POST: Error al setear datos usuario = " + e.getMessage());
                 }
-                sistema.modificarCliente(new DtCliente(usuario, apellido, fechaNacDate, nacionalidad, tipoDocumentoEnum, numDoc));
+                sistema.modificarCliente(new DtCliente(usuario.getNickname(),usuario.getNombre(),usuario.getEmail(),usuario.getUrlImage(), apellido, fechaNacDate, nacionalidad, tipoDocumentoEnum, numDoc));
             } else if (usuarioTipo.equals("aerolinea")) {
                 String descripcion = request.getParameter("descripcion");
                 String linkWeb = request.getParameter("linkWeb");
-                sistema.modificarAerolinea(new DtAerolinea(usuario, descripcion, linkWeb));
+                sistema.modificarAerolinea(new DtAerolinea(usuario.getNickname(),usuario.getNombre(),usuario.getEmail(),usuario.getUrlImage(), descripcion, linkWeb));
             }
 
             // Actualiza session usuario

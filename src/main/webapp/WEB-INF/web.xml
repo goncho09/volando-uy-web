@@ -16,6 +16,11 @@
         <location>/WEB-INF/jsp/error.jsp</location>
     </error-page>
 
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/jsp/error.jsp</location>
+    </error-page>
+
     <session-config>
         <session-timeout>30</session-timeout>  <!-- Minutos -->
         <cookie-config>
@@ -23,11 +28,6 @@
             <secure>false</secure>  <!-- true si HTTPS -->
         </cookie-config>
     </session-config>
-
-<!--    <error-page>-->
-<!--        <error-code>500</error-code>-->
-<!--        <location>/WEB-INF/jsp/errorServer.jsp</location>-->
-<!--    </error-page>-->
 
 <!--    <error-page>-->
 <!--        <exception-type>java.lang.Throwable</exception-type>-->

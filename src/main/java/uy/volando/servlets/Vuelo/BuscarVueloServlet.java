@@ -26,6 +26,8 @@ public class BuscarVueloServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+
+            System.out.println("entrado al servlet buscar vuelo");
             List<DtAerolinea> aerolineas = sistema.listarAerolineas();
 
             aerolineas.removeIf(aerolinea -> {
