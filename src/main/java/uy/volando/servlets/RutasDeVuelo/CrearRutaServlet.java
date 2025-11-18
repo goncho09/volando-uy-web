@@ -1,20 +1,12 @@
 package uy.volando.servlets.RutasDeVuelo;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.clases.Categoria;
-import com.app.clases.Ciudad;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtCategoria;
-import com.app.datatypes.DtCiudad;
-import com.app.datatypes.DtRuta;
-import com.app.enums.EstadoRuta;
-import com.app.enums.TipoImagen;
-import com.app.utils.AuxiliarFunctions;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +23,7 @@ import java.util.List;
 @WebServlet(name = "CrearRutaServlet", urlPatterns = {"/ruta-de-vuelo/crear"})
 public class CrearRutaServlet extends HttpServlet {
 
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -56,7 +48,7 @@ public class CrearRutaServlet extends HttpServlet {
 
         try {
             // Obtener datos para formulario
-            List<DtCiudad> dtCiudades = sistema.listarCiudades();
+            List<DtCiudad> dtCiudades = ws.listarCiudades();
             List<DtCategoria> dtCategorias = getCategoriasDisponibles();
 
             request.setAttribute("ciudades", dtCiudades);
@@ -109,7 +101,7 @@ public class CrearRutaServlet extends HttpServlet {
             }
 
             // Validar que el nombre sea único
-            if (sistema.existeRuta(nombre)) {
+            if (ws.existeRuta(nombre)) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 response.getWriter().write("Ya existe una ruta de vuelo con ese nombre.");
                 return;
@@ -163,7 +155,7 @@ public class CrearRutaServlet extends HttpServlet {
             for (String catNombre : categoriasArray) {
                 nombresCategorias.add(catNombre);
             }
-            List<DtCategoria> categoriasSeleccionadas = sistema.buscarCategoriasPorNombre(nombresCategorias);
+            List<DtCategoria> categoriasSeleccionadas = ws.buscarCategoriasPorNombre(nombresCategorias);
 
             if (categoriasSeleccionadas.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -173,7 +165,7 @@ public class CrearRutaServlet extends HttpServlet {
 
             // Obtener aerolínea desde la sesión
             String nicknameAerolinea = (String) session.getAttribute("usuarioNickname");
-            DtAerolinea aerolinea = sistema.getAerolinea(nicknameAerolinea);
+            DtAerolinea aerolinea = ws.getAerolinea(nicknameAerolinea);
 
             if (aerolinea == null) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -187,37 +179,43 @@ public class CrearRutaServlet extends HttpServlet {
                 return;
             }
 
-            // Crear archivo temporal
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            File tempFile = File.createTempFile("upload-", "-" + fileName);
+            byte[] data = filePart.getInputStream().readAllBytes();
 
-            try (InputStream input = filePart.getInputStream()) {
-                Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            File imagenGuardada = AuxiliarFunctions.guardarImagen(tempFile, TipoImagen.RUTA);
-
-            String imagen = imagenGuardada.getName();
+            String imagen = ws.guardarImagen(data, TipoImagen.RUTA);
 
             LocalDate fechaAlta = LocalDate.now();
 
-            DtRuta ruta = new DtRuta(
-                    nombre,
-                    descripcion,
-                    descripcionCorta,
-                    duracion,
-                    costoTurista,
-                    costoEjecutivo,
-                    costoEquipajeExtra,
-                    fechaAlta,
-                    imagen,
-                    categoriasSeleccionadas,
-                    ciudadOrigen,
-                    ciudadDestino
-            );
+            DtRuta ruta = new DtRuta();
+//                      nombre,
+//                    descripcion,
+//                    descripcionCorta,
+//                    duracion,
+//                    costoTurista,
+//                    costoEjecutivo,
+//                    costoEquipajeExtra,
+//                    fechaAlta,
+//                    imagen,
+//                    categoriasSeleccionadas,
+//                    ciudadOrigen,
+//                    ciudadDestino
+
+            ruta.setNombre(nombre);
+            ruta.setDescripcion(descripcion);
+            ruta.setDescripcionCorta(descripcionCorta);
+            ruta.setDuracion(duracion.toString());
+            ruta.setCostoTurista(costoTurista);
+            ruta.setCostoEjecutivo(costoEjecutivo);
+            ruta.setEquipajeExtra(costoEquipajeExtra);
+            ruta.setFechaAlta(fechaAlta.toString());
+            ruta.setUrlImagen(imagen);
+            ruta.getCategorias().clear();
+            ruta.getCategorias().addAll(categoriasSeleccionadas);
+            ruta.setCiudadOrigen(ciudadOrigen);
+            ruta.setCiudadDestino(ciudadDestino);
+
 
             // Usar el método del sistema para crear la ruta
-            sistema.altaRutaDeVuelo(nicknameAerolinea, ruta);
+            ws.altaRutaDeVuelo(nicknameAerolinea, ruta);
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("Ruta de vuelo creada con éxito");
@@ -240,7 +238,7 @@ public class CrearRutaServlet extends HttpServlet {
             String nombreCiudad = partes[0].trim();
             String pais = partes.length > 1 ? partes[1].trim() : "Uruguay"; // País por defecto
 
-            return sistema.getCiudad(nombreCiudad, pais);
+            return ws.getCiudad(nombreCiudad, pais);
         } catch (Exception e) {
             System.err.println("Error al obtener ciudad: " + ciudadStr + " - " + e.getMessage());
             return null;
@@ -251,7 +249,7 @@ public class CrearRutaServlet extends HttpServlet {
     private List<DtCategoria> getCategoriasDisponibles() {
         List<DtCategoria> dtCategorias = new ArrayList<>();
         try {
-            dtCategorias = sistema.listarCategorias();
+            dtCategorias = ws.listarCategorias();
         } catch (Exception e) {
             System.err.println("Error al obtener categorías: " + e.getMessage());
         }

@@ -1,17 +1,12 @@
 package uy.volando.servlets;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.clases.RutaEnPaquete;
-import com.app.datatypes.DtPaquete;
-import com.app.datatypes.DtRuta;
-import com.app.datatypes.DtRutaEnPaquete;
-import com.app.enums.EstadoRuta;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +15,7 @@ import java.util.List;
 @WebServlet(name = "HomeServlet", urlPatterns = {"/home"})
 public class HomeServlet extends HttpServlet {
 
-    ISistema s = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -32,9 +27,9 @@ public class HomeServlet extends HttpServlet {
 
             if (busqueda != null && !busqueda.isEmpty()) {
 
-                if (s.existeRuta(busqueda)) {
-                    DtRuta ruta = s.getRutaDeVuelo(busqueda);
-                    String basePath = request.getServletContext().getRealPath("/pictures/rutas");
+                if (ws.existeRuta(busqueda)) {
+                    DtRuta ruta = ws.getRutaDeVuelo(busqueda);
+                    String basePath = getServletContext().getRealPath("/pictures/rutas");
                     String contextPath = request.getContextPath();
 
                     String urlImagen = ruta.getUrlImagen();
@@ -53,15 +48,15 @@ public class HomeServlet extends HttpServlet {
 
                 }
 
-                if (s.existePaquete(busqueda)) {
-                    DtPaquete paquete = s.getPaquete(busqueda);
+                if (ws.existePaquete(busqueda)) {
+                    DtPaquete paquete = ws.getPaquete(busqueda);
                     request.setAttribute("paquete", paquete);
                 }
             } else {
                 request.getSession().setAttribute("usuario", null);
 
-                List<DtRuta> listaRuta = s.listarRutasDeVuelo();
-                List<DtPaquete> listaPaquete = s.listarPaquetesNoComprados();
+                List<DtRuta> listaRuta = ws.listarRutasDeVuelo();
+                List<DtPaquete> listaPaquete = ws.listarPaquetesNoComprados();
 
                 listaRuta.removeIf(ruta -> ruta.getEstado() != EstadoRuta.APROBADA);
 
@@ -73,11 +68,11 @@ public class HomeServlet extends HttpServlet {
                 listaPaquete.removeIf(paquete -> paquete.getRutaEnPaquete() == null || paquete.getRutaEnPaquete().isEmpty());
 
                 if(request.getParameter("nombre") != null && !request.getParameter("nombre").isEmpty()){
-                    listaRuta.removeIf(ruta -> !s.rutaContieneCategoria(ruta, request.getParameter("nombre")));
+                    listaRuta.removeIf(ruta -> !ws.rutaContieneCategoria(ruta, request.getParameter("nombre")));
                 }
 
                 for (DtRuta ruta : listaRuta) {
-                    String basePath = request.getServletContext().getRealPath("/pictures/rutas");
+                    String basePath = getServletContext().getRealPath("/pictures/rutas");
                     String contextPath = request.getContextPath();
 
                     String urlImagen = ruta.getUrlImagen();

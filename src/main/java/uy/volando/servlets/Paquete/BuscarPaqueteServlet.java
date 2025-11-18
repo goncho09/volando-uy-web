@@ -1,17 +1,15 @@
 package uy.volando.servlets.Paquete;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.clases.RutaEnPaquete;
-import com.app.datatypes.DtPaquete;
-import com.app.datatypes.DtRutaEnPaquete;
-import com.app.enums.EstadoRuta;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.Session;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtPaquete;
+import uy.volando.soap.client.DtRutaEnPaquete;
+import uy.volando.soap.client.EstadoRuta;
+import uy.volando.soap.client.VolandoServicePort;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,14 +17,14 @@ import java.util.List;
 @WebServlet (name = "BuscarPaqueteServlet", urlPatterns = {"/paquete/buscar"})
 public class BuscarPaqueteServlet extends HttpServlet {
 
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try{
-            List<DtPaquete> listaPaquete = sistema.listarPaquetesNoComprados();
+            List<DtPaquete> listaPaquete = ws.listarPaquetesNoComprados();
 
             for(DtPaquete p : listaPaquete){
                 List<DtRutaEnPaquete> listaRutasPaquete = p.getRutaEnPaquete();

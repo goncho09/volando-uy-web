@@ -1,16 +1,15 @@
 package uy.volando.servlets.Paquete;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtPaquete;
-import com.app.datatypes.DtUsuario;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtPaquete;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
 @WebServlet (name = "VerPaquetesServlet", urlPatterns = {"/paquete/ver"})
 public class VerPaquetesServlet extends HttpServlet {
 
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -41,9 +40,9 @@ public class VerPaquetesServlet extends HttpServlet {
             String nickname = (String) session.getAttribute("usuarioNickname");
             List<DtPaquete> paqueteList = null;
             if (tipoUsuario.equals("aerolinea")) {
-                paqueteList = sistema.listarPaquetesAerolinea(nickname);
+                paqueteList = ws.listarPaquetesAerolinea(nickname);
             }else{
-                paqueteList = sistema.listarPaquetesCliente(nickname);
+                paqueteList = ws.listarPaquetesCliente(nickname);
             }
             request.setAttribute("paquetes", paqueteList);
 

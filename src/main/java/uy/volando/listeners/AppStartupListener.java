@@ -1,13 +1,14 @@
 package uy.volando.listeners;
 
-import com.app.clases.Factory;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtCategoria;
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.annotation.WebListener;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import java.util.List;
-import com.app.clases.ISistema;
+
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.WSConfig;
+import uy.volando.soap.client.DtAerolinea;
+import uy.volando.soap.client.VolandoServicePort;
 
 @WebListener
 public class AppStartupListener implements ServletContextListener {
@@ -15,20 +16,24 @@ public class AppStartupListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            ISistema sistema = Factory.getSistema();
-            //sistema.cargarDatos();
+            WSConfig.init(sce.getServletContext());
 
-            List <DtAerolinea> aerolineas = sistema.listarAerolineas();
-            aerolineas.removeIf(aerolinea -> aerolinea.listarRutasDeVuelo().isEmpty());
+            VolandoServicePort ws = ControladorWS.getPort();
 
-//            List < DtPaquete> paquetes = sistema.listarPaquetes();
-//            List < DtRuta> rutas = sistema.listarRutasDeVuelo();
+            List <DtAerolinea> aerolineas = ws.listarAerolineas();
+            aerolineas.removeIf(aerolinea -> aerolinea.getRutasDeVuelo().isEmpty());
 
-            sce.getServletContext().setAttribute("categorias", sistema.listarCategorias());
+            sce.getServletContext().setAttribute("categorias", ws.listarCategorias());
             sce.getServletContext().setAttribute("aerolineasConRuta",aerolineas);
 
         } catch (Exception e) {
-            System.err.println("Error al cargar categorías en el listener:");
+            System.err.println("¡Error al cargar los datos iniciales!");
+            e.printStackTrace();
         }
     }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+    }
+
 }

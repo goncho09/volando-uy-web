@@ -1,12 +1,12 @@
 package uy.volando.servlets.Perfil;
 
-import com.app.enums.TipoDocumento;
-import com.app.enums.TipoImagen;
-import com.app.utils.AuxiliarFunctions;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,10 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.*;
 
 
 @MultipartConfig
@@ -29,7 +25,7 @@ import com.app.datatypes.*;
         )
 @WebServlet(name = "PerfilServlet", urlPatterns = {"/perfil"})
 public class PerfilServlet extends HttpServlet {
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,9 +41,9 @@ public class PerfilServlet extends HttpServlet {
         }
 
         try {
-            DtUsuario usuario = sistema.getUsuario(nickname);
+            DtUsuario usuario = ws.getUsuario(nickname);
 
-            String basePath = request.getServletContext().getRealPath("/pictures/users");
+            String basePath = getServletContext().getRealPath("/pictures/users");
             String contextPath = request.getContextPath();
 
             String urlImagen = usuario.getUrlImage();
@@ -66,8 +62,13 @@ public class PerfilServlet extends HttpServlet {
             boolean sigue = false;
             if (session != null && session.getAttribute("usuarioNickname") != null && session.getAttribute("usuarioTipo") !=null){
                 String userNickname = (String) session.getAttribute("usuarioNickname");
-                DtUsuario user = sistema.getUsuario(userNickname);
-                sigue = user.sigueA(usuario.getNickname());
+                DtUsuario user = ws.getUsuario(userNickname);
+                for (Usuario u : user.getSeguidos()) {
+                    if (u.getNickname().equals(nickname)) {
+                        sigue = true;
+                        break;
+                    }
+                }
                 System.out.println(sigue);
                 if (userNickname.equals(nickname)) {
                     modificar = true;
@@ -76,14 +77,14 @@ public class PerfilServlet extends HttpServlet {
 
             DtAerolinea aerolinea = null;
             try{
-                aerolinea = sistema.getAerolinea(nickname);
+                aerolinea = ws.getAerolinea(nickname);
             }  catch (Exception ignored) {}
 
             if (aerolinea != null) {
                 request.setAttribute("aerolinea", aerolinea);
                 request.setAttribute("usuarioTipoPerfil","aerolinea");
             } else {
-                DtCliente cliente = sistema.getCliente(nickname);
+                DtCliente cliente = ws.getCliente(nickname);
                 request.setAttribute("cliente", cliente);
                 request.setAttribute("usuarioTipoPerfil","cliente");
             }
@@ -117,21 +118,14 @@ public class PerfilServlet extends HttpServlet {
         try {
             String usuarioTipo = (String) session.getAttribute("usuarioTipo");
             String nickname = (String) session.getAttribute("usuarioNickname");
-            DtUsuario usuario = sistema.getUsuario(nickname);
+            DtUsuario usuario = ws.getUsuario(nickname);
 
             Part imagePart = request.getPart("image");
             String nombre = request.getParameter("nombre");
 
-            String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
-            File tempFile = File.createTempFile("upload-", "-" + fileName);
+            byte[] data = imagePart.getInputStream().readAllBytes();
 
-            try (InputStream input = imagePart.getInputStream()) {
-                Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            File imagenGuardada = AuxiliarFunctions.guardarImagen(tempFile, TipoImagen.USUARIO);
-
-            String fotoPerfil = imagenGuardada.getName();
+            String fotoPerfil = ws.guardarImagen(data, TipoImagen.USUARIO);
             usuario.setNombre(nombre);
             usuario.setUrlImage(fotoPerfil);
 
@@ -164,15 +158,38 @@ public class PerfilServlet extends HttpServlet {
                     response.getWriter().write("ERROR: Tipo o número de documento inválido");
                     System.out.println(">>> PerfilServlet POST: Error al setear datos usuario = " + e.getMessage());
                 }
-                sistema.modificarCliente(new DtCliente(usuario.getNickname(),usuario.getNombre(),usuario.getEmail(),usuario.getUrlImage(), apellido, fechaNacDate, nacionalidad, tipoDocumentoEnum, numDoc));
+
+                DtCliente clienteModify = new DtCliente();
+
+                clienteModify.setNickname(usuario.getNickname());
+                clienteModify.setNombre(usuario.getNombre());
+                clienteModify.setEmail(usuario.getEmail());
+                clienteModify.setUrlImage(usuario.getUrlImage());
+                clienteModify.setApellido(apellido);
+                clienteModify.setFechaNacimiento(fechaNacDate.toString());
+                clienteModify.setNacionalidad(nacionalidad);
+                clienteModify.setTipoDocumento(tipoDocumentoEnum);
+                clienteModify.setNumeroDocumento(numDoc);
+
+                ws.modificarCliente(clienteModify);
             } else if (usuarioTipo.equals("aerolinea")) {
                 String descripcion = request.getParameter("descripcion");
                 String linkWeb = request.getParameter("linkWeb");
-                sistema.modificarAerolinea(new DtAerolinea(usuario.getNickname(),usuario.getNombre(),usuario.getEmail(),usuario.getUrlImage(), descripcion, linkWeb));
+
+                DtAerolinea aerolineaModify = new DtAerolinea();
+
+                aerolineaModify.setNickname(usuario.getNickname());
+                aerolineaModify.setNombre(usuario.getNombre());
+                aerolineaModify.setEmail(usuario.getEmail());
+                aerolineaModify.setUrlImage(usuario.getUrlImage());
+                aerolineaModify.setDescripcion(descripcion);
+                aerolineaModify.setLinkWeb(linkWeb);
+
+                ws.modificarAerolinea(aerolineaModify);
             }
 
             // Actualiza session usuario
-            DtUsuario updatedUsuario = sistema.getUsuario(nickname);
+            DtUsuario updatedUsuario = ws.getUsuario(nickname);
             session.setAttribute("usuario", updatedUsuario);
             session.setAttribute("usuarioImagen", updatedUsuario.getUrlImage());
             request.setAttribute("success", "Perfil actualizado correctamente");

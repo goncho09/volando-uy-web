@@ -1,15 +1,12 @@
 package uy.volando.servlets.Sesion;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtCliente;
-import com.app.datatypes.DtUsuario;
-import com.app.enums.TipoDocumento;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -18,15 +15,15 @@ import java.time.LocalDate;
 public class RegistrarUsuarioFinalServlet extends HttpServlet {
 
     @Override
-    protected void doGet(jakarta.servlet.http.HttpServletRequest request, HttpServletResponse response)
-            throws jakarta.servlet.ServletException, java.io.IOException {
+    protected void doGet(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
+            throws javax.servlet.ServletException, java.io.IOException {
 
         request.getRequestDispatcher("/WEB-INF/jsp/signup/registrarUsuarioFinal.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(jakarta.servlet.http.HttpServletRequest request, HttpServletResponse response)
-            throws jakarta.servlet.ServletException, java.io.IOException {
+    protected void doPost(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
+            throws javax.servlet.ServletException, java.io.IOException {
 
         response.setContentType("text/plain;charset=UTF-8");
 
@@ -46,7 +43,7 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
                 return;
             }
 
-            ISistema sistema = Factory.getSistema();
+            VolandoServicePort ws = ControladorWS.getPort();
 
             String nickname = dtUsuarioTemp.getNickname();  // Para auto-login después
 
@@ -70,8 +67,17 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
                     urlSitioWeb = "";  // Permite empty
                 }
 
-                sistema.registrarAerolinea(new DtAerolinea(dtUsuarioTemp.getNickname(), dtUsuarioTemp.getNombre(), dtUsuarioTemp.getEmail(),
-                        dtUsuarioTemp.getPassword(), dtUsuarioTemp.getUrlImage(), descripcion, urlSitioWeb));
+                DtAerolinea nuevaAerolinea = new DtAerolinea();
+
+                nuevaAerolinea.setNickname(dtUsuarioTemp.getNickname());
+                nuevaAerolinea.setNombre(dtUsuarioTemp.getNombre());
+                nuevaAerolinea.setEmail(dtUsuarioTemp.getEmail());
+                nuevaAerolinea.setPassword(dtUsuarioTemp.getPassword());
+                nuevaAerolinea.setUrlImage(dtUsuarioTemp.getUrlImage());
+                nuevaAerolinea.setDescripcion(descripcion);
+                nuevaAerolinea.setUrlImage(urlSitioWeb);
+
+                ws.registrarAerolinea(nuevaAerolinea);
 
             } else {  // Asume "cliente"
                 String apellido = request.getParameter("apellido");
@@ -124,13 +130,25 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
                     return;
                 }
 
-                sistema.registrarCliente(new DtCliente(dtUsuarioTemp.getNickname(), dtUsuarioTemp.getNombre(), dtUsuarioTemp.getEmail(),
-                        dtUsuarioTemp.getPassword(), dtUsuarioTemp.getUrlImage(), apellido, fechaNac, nacionalidad, tipoDocumento, numDocumento));
+                DtCliente nuevoCliente = new DtCliente();
+
+                nuevoCliente.setNickname(dtUsuarioTemp.getNickname());
+                nuevoCliente.setNombre(dtUsuarioTemp.getNombre());
+                nuevoCliente.setEmail(dtUsuarioTemp.getEmail());
+                nuevoCliente.setPassword(dtUsuarioTemp.getPassword());
+                nuevoCliente.setUrlImage(dtUsuarioTemp.getUrlImage());
+                nuevoCliente.setApellido(apellido);
+                nuevoCliente.setFechaNacimiento(fechaNac.toString());
+                nuevoCliente.setNacionalidad(nacionalidad);
+                nuevoCliente.setTipoDocumento(tipoDocumento);
+                nuevoCliente.setNumeroDocumento(numDocumento);
+
+                ws.registrarCliente(nuevoCliente);
             }
 
             // <-- NUEVO: Auto-login después de registrar
             // Recarga el usuario recién creado (ajusta si elegirUsuario usa email en vez de nick)
-            DtUsuario usuario = sistema.getUsuario(nickname);
+            DtUsuario usuario = ws.getUsuario(nickname);
 
             // Crea nueva sesión y setea atributos (copia de LogInServlet)
             HttpSession newSession = request.getSession(true);
@@ -139,7 +157,7 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
             newSession.setAttribute("usuario", usuario);  // Para perfil JSP
 
             // Actualiza urlImage como en login (si hace falta)
-            String basePath = request.getServletContext().getRealPath("/pictures/users");
+            String basePath = getServletContext().getRealPath("/pictures/users");
             String contextPath = request.getContextPath();
             String urlImagen = usuario.getUrlImage();
             if (urlImagen == null || urlImagen.isEmpty() || !new File(basePath, urlImagen).exists()) {

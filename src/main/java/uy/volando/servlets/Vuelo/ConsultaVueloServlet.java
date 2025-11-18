@@ -1,14 +1,14 @@
 package uy.volando.servlets.Vuelo;
 
-import com.app.clases.Factory;
-import com.app.clases.Sistema;
-import com.app.datatypes.*;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @WebServlet(name = "ConsultaVueloServlet", urlPatterns = {"/vuelo/consulta"})
 public class ConsultaVueloServlet extends HttpServlet {
-    Sistema sistema = (Sistema) Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -27,10 +27,10 @@ public class ConsultaVueloServlet extends HttpServlet {
         try {
             String idVuelo = request.getParameter("nombre");
 
-            DtVuelo vuelo = sistema.getVuelo(idVuelo);
+            DtVuelo vuelo = ws.getVuelo(idVuelo);
             DtRuta ruta = vuelo.getRutaDeVuelo();
 
-            String basePath = request.getServletContext().getRealPath("/pictures/vuelos");
+            String basePath = getServletContext().getRealPath("/pictures/vuelos");
             String contextPath = request.getContextPath();
 
             String urlImage = vuelo.getUrlImage();
@@ -54,16 +54,16 @@ public class ConsultaVueloServlet extends HttpServlet {
             if(session.getAttribute("usuarioNickname") != null && session.getAttribute("usuarioTipo") != null) {
                 String tipo = session.getAttribute("usuarioTipo").toString();
                 if(tipo.equals("aerolinea")) {
-                    DtAerolinea aerolineaObj = sistema.getAerolinea(session.getAttribute("usuarioNickname").toString());
-                    for (DtRuta r : aerolineaObj.listarRutasDeVuelo()) {
+                    DtAerolinea aerolineaObj = ws.getAerolinea(session.getAttribute("usuarioNickname").toString());
+                    for (DtRuta r : aerolineaObj.getRutasDeVuelo()) {
                         if (r.getNombre().equals(ruta.getNombre())) {
                             request.setAttribute("esDeLaAerolinea", true);
                             break;
                         }
                     }
                 }else{
-                    DtCliente cliente = sistema.getCliente(session.getAttribute("usuarioNickname").toString());
-                    List<DtReserva> reservas = sistema.listarReservasClienteVuelo(cliente,vuelo);
+                    DtCliente cliente = ws.getCliente(session.getAttribute("usuarioNickname").toString());
+                    List<DtReserva> reservas = ws.listarReservasClienteVuelo(cliente,vuelo);
                     if(!reservas.isEmpty()) {
                         request.setAttribute("tieneReserva", true);
                     }

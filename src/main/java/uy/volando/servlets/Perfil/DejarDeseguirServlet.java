@@ -1,19 +1,20 @@
 package uy.volando.servlets.Perfil;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 
 @WebServlet(name = "DejarDeseguirServlet", urlPatterns = {"/dejar-de-seguir","/unfollow"})
 public class DejarDeseguirServlet extends HttpServlet {
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -29,7 +30,7 @@ public class DejarDeseguirServlet extends HttpServlet {
         try {
             String nicknameSeguir = request.getParameter("nickname");
             String nickname = (String) session.getAttribute("usuarioNickname");
-            sistema.dejarDeSeguirUsuario(nickname,nicknameSeguir);
+            ws.dejarDeSeguirUsuario(nickname,nicknameSeguir);
 
             response.sendRedirect(request.getContextPath() + "/perfil?nickname=" + nicknameSeguir);
         } catch (Exception e) {

@@ -1,15 +1,15 @@
 package uy.volando.servlets.Paquete;
 
-import com.app.clases.*;
-import com.app.datatypes.DtCliente;
-import com.app.datatypes.DtPaquete;
-import com.app.datatypes.DtRuta;
-import com.app.datatypes.DtRutaEnPaquete;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtPaquete;
+import uy.volando.soap.client.DtRuta;
+import uy.volando.soap.client.DtRutaEnPaquete;
+import uy.volando.soap.client.VolandoServicePort;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.util.List;
 @WebServlet (name = "ConsultarPaqueteServlet", urlPatterns = {"/paquete/consulta"})
 public class ConsultarPaqueteServlet extends HttpServlet {
 
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -28,7 +28,7 @@ public class ConsultarPaqueteServlet extends HttpServlet {
         try{
             String nombre = request.getParameter("nombre");
 
-            DtPaquete paquete = sistema.getPaquete(nombre);
+            DtPaquete paquete = ws.getPaquete(nombre);
 
             if (paquete == null) {request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);}
 
@@ -36,7 +36,7 @@ public class ConsultarPaqueteServlet extends HttpServlet {
 
             if(rutaEnPaqueteList == null || rutaEnPaqueteList.isEmpty()){request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);}
 
-            String basePath = request.getServletContext().getRealPath("/pictures/rutas");
+            String basePath = getServletContext().getRealPath("/pictures/rutas");
             String contextPath = request.getContextPath();
 
             for (DtRutaEnPaquete rp : rutaEnPaqueteList) {
@@ -55,7 +55,7 @@ public class ConsultarPaqueteServlet extends HttpServlet {
                 }
             }
 
-            boolean comprado = sistema.estaPaqueteComprado(paquete);
+            boolean comprado = ws.estaPaqueteComprado(paquete);
 
             request.setAttribute("paquete", paquete);
             request.setAttribute("comprado", comprado);

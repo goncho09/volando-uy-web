@@ -1,22 +1,28 @@
 package uy.volando.servlets.Reserva;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtCliente;
-import com.app.datatypes.DtVuelo;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
+
+
+
+
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtAerolinea;
+import uy.volando.soap.client.DtCliente;
+import uy.volando.soap.client.DtVuelo;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDate;
 
 @WebServlet(name = "ConsultaReserva", urlPatterns = {"/reservas/consulta"})
 public class ConsultaReserva extends HttpServlet {
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,15 +45,15 @@ public class ConsultaReserva extends HttpServlet {
             String usuarioTipo = (String) request.getSession().getAttribute("usuarioTipo");
             String fechaReserva = request.getParameter("fecha");
             LocalDate fechaReservaDate = LocalDate.parse(fechaReserva);
-            DtVuelo vuelo = sistema.getVuelo(request.getParameter("vuelo"));
+            DtVuelo vuelo = ws.getVuelo(request.getParameter("vuelo"));
 
             if (usuarioTipo.equals("cliente")) {
-                DtCliente cliente = sistema.getCliente(nickname);
-                request.setAttribute("reserva", sistema.getReservaCliente(vuelo, cliente, fechaReservaDate));
+                DtCliente cliente = ws.getCliente(nickname);
+                request.setAttribute("reserva", ws.getReservaCliente(vuelo, cliente, fechaReservaDate.toString()));
             }
             else{
-                DtAerolinea aerolinea = sistema.getAerolinea(nickname);
-                request.setAttribute("reserva", sistema.getReservaAerolinea(vuelo, aerolinea, fechaReservaDate));
+                DtAerolinea aerolinea = ws.getAerolinea(nickname);
+                request.setAttribute("reserva", ws.getReservaAerolinea(vuelo, aerolinea, fechaReservaDate.toString()));
             }
 
             request.getRequestDispatcher("/WEB-INF/jsp/reservas/consulta.jsp").forward(request, response);

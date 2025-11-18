@@ -1,22 +1,27 @@
 package uy.volando.servlets.Reserva;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtCliente;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
+
+
+
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtAerolinea;
+import uy.volando.soap.client.DtCliente;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 
 @WebServlet (name = "VerReservaServlet", urlPatterns = {"/reservas/ver"})
 public class VerReservaServlet extends HttpServlet {
 
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,12 +44,12 @@ public class VerReservaServlet extends HttpServlet {
             String nicknameCliente = (String) request.getSession().getAttribute("usuarioNickname");
 
             if (usuarioTipo.equals("cliente")) {
-                DtCliente cliente = sistema.getCliente(nicknameCliente);
-                request.setAttribute("reservas", sistema.listarReservasCliente(cliente.getNickname()));
+                DtCliente cliente = ws.getCliente(nicknameCliente);
+                request.setAttribute("reservas", ws.listarReservasCliente(cliente.getNickname()));
             }
             else{
-                DtAerolinea aerolinea = sistema.getAerolinea(nicknameCliente);
-                request.setAttribute("reservas", sistema.listarReservasAerolinea(aerolinea.getNickname()));
+                DtAerolinea aerolinea = ws.getAerolinea(nicknameCliente);
+                request.setAttribute("reservas", ws.listarReservasAerolinea(aerolinea.getNickname()));
             }
 
             request.getRequestDispatcher("/WEB-INF/jsp/reservas/ver.jsp").forward(request, response);

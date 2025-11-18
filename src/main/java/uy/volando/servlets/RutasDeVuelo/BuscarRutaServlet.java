@@ -1,11 +1,14 @@
 package uy.volando.servlets.RutasDeVuelo;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,15 +19,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.*;
-import com.app.enums.EstadoRuta;
-
 @WebServlet(name = "RutaServlet", urlPatterns = {"/ruta-de-vuelo/buscar"})
 public class BuscarRutaServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(BuscarRutaServlet.class.getName());
-    ISistema s = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,7 +37,7 @@ public class BuscarRutaServlet extends HttpServlet {
                 throw new IllegalArgumentException("Nombre de ruta requerido");
             }
 
-            DtRuta ruta = s.getRutaDeVuelo(nombreRuta);
+            DtRuta ruta = ws.getRutaDeVuelo(nombreRuta);
             if (ruta == null) {
                 throw new Exception("Ruta no encontrada");
             }
@@ -48,7 +46,7 @@ public class BuscarRutaServlet extends HttpServlet {
             }
 
             // Procesar imagen de ruta
-            String basePath = request.getServletContext().getRealPath("/pictures/rutas");
+            String basePath = getServletContext().getRealPath("/pictures/rutas");
             String contextPath = request.getContextPath();
             String urlImagen = ruta.getUrlImagen();
             File rutaImg = null;
@@ -64,11 +62,11 @@ public class BuscarRutaServlet extends HttpServlet {
             }
 
             // Procesar vuelos
-            List<DtVuelo> vueloList = s.getVuelosRutaDeVuelo(ruta);
-            vueloList.removeIf(vuelo -> vuelo.getFecha().isBefore(LocalDate.now()));
+            List<DtVuelo> vueloList = ws.getVuelosRutaDeVuelo(ruta);
+            vueloList.removeIf(vuelo -> LocalDate.parse(vuelo.getFecha().toString()).isBefore(LocalDate.now()));
 
             for (DtVuelo vuelo : vueloList) {
-                basePath = request.getServletContext().getRealPath("/pictures/vuelos");  // Reasigna basePath
+                basePath = getServletContext().getRealPath("/pictures/vuelos");  // Reasigna basePath
 
                 String urlImage = vuelo.getUrlImage();
                 File vueloImg = null;
@@ -85,7 +83,7 @@ public class BuscarRutaServlet extends HttpServlet {
             }
 
             // Procesar paquetes
-            List<DtPaquete> paqueteList = s.listarPaquetesNoComprados();
+            List<DtPaquete> paqueteList = ws.listarPaquetesNoComprados();
             paqueteList.removeIf(paquete -> {
                 List<DtRutaEnPaquete> rutaList = paquete.getRutaEnPaquete();
                 if (rutaList == null || rutaList.isEmpty()) return true;
@@ -105,9 +103,9 @@ public class BuscarRutaServlet extends HttpServlet {
                 String nickname = session.getAttribute("usuarioNickname").toString();
                 System.out.println(">>> BuscarRuta: Chequeando owner para " + nickname);  // Debug
 
-                DtAerolinea a = s.getAerolinea(nickname);
+                DtAerolinea a = ws.getAerolinea(nickname);
                 if (a != null) {
-                    List<DtRuta> rutasAerolinea = a.listarRutasDeVuelo();
+                    List<DtRuta> rutasAerolinea = a.getRutasDeVuelo();
                     if (!rutasAerolinea.isEmpty()) {
                         for (DtRuta r : rutasAerolinea) {
                             if (r.getNombre().equals(nombreRuta)) {

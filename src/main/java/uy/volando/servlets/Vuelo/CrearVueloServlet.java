@@ -1,20 +1,22 @@
 package uy.volando.servlets.Vuelo;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.clases.RutaDeVuelo;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtPaquete;
-import com.app.datatypes.DtRuta;
-import com.app.datatypes.DtVuelo;
-import com.app.enums.EstadoRuta;
-import com.app.enums.TipoImagen;
-import com.app.utils.AuxiliarFunctions;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+
+
+
+
+
+
+
+
+
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
 import uy.volando.servlets.RutasDeVuelo.BuscarRutaServlet;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +34,7 @@ import java.util.logging.Logger;
 @WebServlet (name = "CrearVueloServlet", urlPatterns = {"/vuelo/crear"})
 public class CrearVueloServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(CrearVueloServlet.class.getName());
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -51,7 +53,7 @@ public class CrearVueloServlet extends HttpServlet {
         }
 
         try{
-            DtAerolinea aerolinea = sistema.getAerolinea(session.getAttribute("usuarioNickname").toString());
+            DtAerolinea aerolinea = ws.getAerolinea(session.getAttribute("usuarioNickname").toString());
 
             if (aerolinea == null || !aerolinea.getNickname().equals(session.getAttribute("usuarioNickname").toString())) {
                 response.sendRedirect(request.getContextPath() + "/home");
@@ -59,11 +61,11 @@ public class CrearVueloServlet extends HttpServlet {
             }
 
             if(request.getParameter("ruta") != null){
-                DtRuta ruta = sistema.getRutaDeVuelo(request.getParameter("ruta"));
+                DtRuta ruta = ws.getRutaDeVuelo(request.getParameter("ruta"));
                 request.setAttribute("seleccionarRuta", ruta);
             }
 
-            List<DtRuta> rutas = aerolinea.listarRutasDeVuelo();
+            List<DtRuta> rutas = aerolinea.getRutasDeVuelo();
 
             rutas.removeIf(ruta -> ruta.getEstado() != EstadoRuta.APROBADA);
 
@@ -99,7 +101,7 @@ public class CrearVueloServlet extends HttpServlet {
                 return;
             }
 
-            if (sistema.existeVuelo(nombre)) {
+            if (ws.existeVuelo(nombre)) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 response.getWriter().write("Ya existe un vuelo con ese nombre");
                 return;
@@ -144,19 +146,23 @@ public class CrearVueloServlet extends HttpServlet {
                 return;
             }
 
-            // Crear archivo temporal
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            File tempFile = File.createTempFile("upload-", "-" + fileName);
+            byte[] data = filePart.getInputStream().readAllBytes();
 
-            try (InputStream input = filePart.getInputStream()) {
-                Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
+            String imagen = ws.guardarImagen(data, TipoImagen.VUELO);
 
-            File imagenGuardada = AuxiliarFunctions.guardarImagen(tempFile, TipoImagen.VUELO);
+            DtVuelo nuevoVuelo = new DtVuelo();
 
-            String imagen = imagenGuardada.getName();
+            nuevoVuelo.setNombre(nombre);
+            nuevoVuelo.setFecha(fecha.toString());
+            nuevoVuelo.setDuracion(duracion.toString());
+            nuevoVuelo.setMaxTuristas(maxTuristas);
+            nuevoVuelo.setMaxEjecutivos(maxEjecutivos);
+            nuevoVuelo.setUrlImage(imagen);
+            nuevoVuelo.setFechaAlta(LocalDate.now().toString());
+            nuevoVuelo.setRutaDeVuelo(ws.getRutaDeVuelo(rutaStr));
+            nuevoVuelo.setCantReservas(0);
 
-            sistema.altaVuelo(new DtVuelo(nombre, fecha, duracion, maxTuristas, maxEjecutivos, imagen, LocalDate.now(), sistema.getRutaDeVuelo(rutaStr), 0));
+            ws.altaVuelo(nuevoVuelo);
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("Vuelo creado con éxito");

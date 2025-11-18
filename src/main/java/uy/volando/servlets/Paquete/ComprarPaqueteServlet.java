@@ -1,18 +1,14 @@
 package uy.volando.servlets.Paquete;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.clases.RutaEnPaquete;
-import com.app.datatypes.DtCliente;
-import com.app.datatypes.DtPaquete;
-import com.app.datatypes.DtRutaEnPaquete;
-import com.app.enums.EstadoRuta;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +16,7 @@ import java.util.List;
 @WebServlet(name = "ComprarPaqueteServlet", urlPatterns = {"/paquete/comprar"})
 public class ComprarPaqueteServlet extends HttpServlet {
 
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -44,7 +40,7 @@ public class ComprarPaqueteServlet extends HttpServlet {
         }
 
         try {
-            List<DtPaquete> listaPaquete = sistema.listarPaquetesNoComprados();
+            List<DtPaquete> listaPaquete = ws.listarPaquetesNoComprados();
 
             for(DtPaquete p : listaPaquete){
                 List<DtRutaEnPaquete> listaRutasPaquete = p.getRutaEnPaquete();
@@ -91,8 +87,8 @@ public class ComprarPaqueteServlet extends HttpServlet {
             }
 
             String nicknameCliente = (String) session.getAttribute("usuarioNickname");
-            DtCliente clienteLogueado = sistema.getCliente(nicknameCliente);
-            DtPaquete paqueteSelect = sistema.getPaquete(paqueteNombre);
+            DtCliente clienteLogueado = ws.getCliente(nicknameCliente);
+            DtPaquete paqueteSelect = ws.getPaquete(paqueteNombre);
 
             if (paqueteSelect == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -100,9 +96,9 @@ public class ComprarPaqueteServlet extends HttpServlet {
                 return;
             }
 
-            sistema.compraPaquete(paqueteSelect, clienteLogueado);
+            ws.compraPaquete(paqueteSelect, clienteLogueado);
 
-            List<DtPaquete> paquetes = sistema.listarPaquetesNoComprados();
+            List<DtPaquete> paquetes = ws.listarPaquetesNoComprados();
             request.setAttribute("paquetes", paquetes);
 
             response.setStatus(HttpServletResponse.SC_OK);

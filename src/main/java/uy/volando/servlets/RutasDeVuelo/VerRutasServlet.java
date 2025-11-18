@@ -1,21 +1,25 @@
 package uy.volando.servlets.RutasDeVuelo;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtAerolinea;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
+
+
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtAerolinea;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 
 @WebServlet (name = "VerRutasServlet", urlPatterns = {"/ruta-de-vuelo/ver"})
 public class VerRutasServlet extends HttpServlet {
 
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -38,8 +42,8 @@ public class VerRutasServlet extends HttpServlet {
 
         try{
 
-            DtAerolinea aerolineaIniciada = (DtAerolinea) sistema.getAerolinea(session.getAttribute("usuarioNickname").toString());
-            request.setAttribute("rutas", aerolineaIniciada.listarRutasDeVuelo());
+            DtAerolinea aerolineaIniciada = (DtAerolinea) ws.getAerolinea(session.getAttribute("usuarioNickname").toString());
+            request.setAttribute("rutas", aerolineaIniciada.getRutasDeVuelo());
 
             request.getRequestDispatcher("/WEB-INF/jsp/rutaDeVuelo/ver.jsp").forward(request, response);
         } catch (Exception e) {

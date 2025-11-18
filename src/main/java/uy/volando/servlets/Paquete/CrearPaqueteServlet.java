@@ -1,14 +1,18 @@
 package uy.volando.servlets.Paquete;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtPaquete;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
+
+
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtPaquete;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -44,7 +48,7 @@ public class CrearPaqueteServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            ISistema sistema = Factory.getSistema();
+            VolandoServicePort ws = ControladorWS.getPort();
 
             String nombre = request.getParameter("nombre");
             String descripcion = request.getParameter("descripcion");
@@ -57,7 +61,7 @@ public class CrearPaqueteServlet extends HttpServlet {
                 return;
             }
 
-            if (sistema.existePaquete(nombre)) {
+            if (ws.existePaquete(nombre)) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 response.getWriter().write("Ya existe un paquete con ese nombre");
                 return;
@@ -73,7 +77,14 @@ public class CrearPaqueteServlet extends HttpServlet {
                 return;
             }
 
-            sistema.altaPaquete(new DtPaquete(nombre, descripcion, validezDias, descuento));
+            DtPaquete paquete = new DtPaquete();
+
+            paquete.setNombre(nombre);
+            paquete.setDescripcion(descripcion);
+            paquete.setValidezDias(validezDias);
+            paquete.setDescuento(descuento);
+
+            ws.altaPaquete(paquete);
 
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("Paquete creado con éxito");

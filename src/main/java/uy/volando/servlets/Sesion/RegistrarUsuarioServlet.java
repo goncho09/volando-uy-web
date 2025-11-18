@@ -1,16 +1,16 @@
 package uy.volando.servlets.Sesion;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtUsuario;
-import com.app.enums.TipoImagen;
-import com.app.utils.AuxiliarFunctions;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtUsuario;
+import uy.volando.soap.client.TipoImagen;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import java.io.File;
 import java.io.InputStream;
@@ -24,20 +24,20 @@ import java.util.ArrayList;
 public class RegistrarUsuarioServlet extends HttpServlet {
 
     @Override
-    protected void doGet(jakarta.servlet.http.HttpServletRequest request, HttpServletResponse response)
-            throws jakarta.servlet.ServletException, java.io.IOException {
+    protected void doGet(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
+            throws javax.servlet.ServletException, java.io.IOException {
 
         request.getRequestDispatcher("/WEB-INF/jsp/signup/registrarUsuario.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(jakarta.servlet.http.HttpServletRequest request, HttpServletResponse response)
-            throws jakarta.servlet.ServletException, java.io.IOException {
+    protected void doPost(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
+            throws javax.servlet.ServletException, java.io.IOException {
 
         response.setContentType("text/plain;charset=UTF-8");
 
         try {
-            ISistema sistema = Factory.getSistema();
+            VolandoServicePort ws = ControladorWS.getPort();
 
             String nickname = request.getParameter("nickname");
             if (nickname == null || nickname.trim().isEmpty()) {
@@ -46,7 +46,7 @@ public class RegistrarUsuarioServlet extends HttpServlet {
                 return;
             }
 
-            if (sistema.existeUsuario(nickname)) {
+            if (ws.existeUsuario(nickname)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Ya existe un usuario con ese nickname.");
                 return;
@@ -58,7 +58,7 @@ public class RegistrarUsuarioServlet extends HttpServlet {
                 response.getWriter().write("Email requerido.");
                 return;
             }
-            if (sistema.existeUsuarioEmail(email)) {
+            if (ws.existeUsuarioEmail(email)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Ya existe un usuario con ese email.");
                 return;
@@ -88,20 +88,23 @@ public class RegistrarUsuarioServlet extends HttpServlet {
                 return;
             }
 
-            // Crear archivo temporal
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            File tempFile = File.createTempFile("upload-", "-" + fileName);
+            byte[] data = filePart.getInputStream().readAllBytes();
 
-            try (InputStream input = filePart.getInputStream()) {
-                Files.copy(input, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            File imagenGuardada = AuxiliarFunctions.guardarImagen(tempFile, TipoImagen.USUARIO);
-
-            String fotoPerfil = imagenGuardada.getName();
+            String fotoPerfil = ws.guardarImagen(data, TipoImagen.USUARIO);
 
             HttpSession session = request.getSession(true);
-            session.setAttribute("datosUsuario", new DtUsuario(nickname,nombre, email, password, fotoPerfil,new ArrayList<>(), new ArrayList<>()));
+
+            DtUsuario datosUsuario = new DtUsuario();
+
+            datosUsuario.setNickname(nickname);
+            datosUsuario.setNombre(nombre);
+            datosUsuario.setEmail(email);
+            datosUsuario.setPassword(password);
+            datosUsuario.setUrlImage(fotoPerfil);
+            datosUsuario.getSeguidos();
+            datosUsuario.getSeguidores();
+
+            session.setAttribute("datosUsuario", datosUsuario);
             session.setAttribute("tipoUsuario", tipoUsuario);
 
             response.setStatus(HttpServletResponse.SC_OK);

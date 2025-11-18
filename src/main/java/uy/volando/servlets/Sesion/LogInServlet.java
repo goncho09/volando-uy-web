@@ -1,16 +1,22 @@
 package uy.volando.servlets.Sesion;
 
-import com.app.clases.Factory;
-import com.app.clases.ISistema;
-import com.app.datatypes.DtAerolinea;
-import com.app.datatypes.DtCliente;
-import com.app.datatypes.DtUsuario;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
+
+
+
+
+import uy.volando.soap.ControladorWS;
+import uy.volando.soap.client.DtAerolinea;
+import uy.volando.soap.client.DtCliente;
+import uy.volando.soap.client.DtUsuario;
+import uy.volando.soap.client.VolandoServicePort;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +25,7 @@ import java.io.IOException;
 
 @WebServlet (name = "LogInServlet", urlPatterns = {"/login","/signin"})
 public class LogInServlet extends HttpServlet {
-    ISistema sistema = Factory.getSistema();
+    VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,15 +51,15 @@ public class LogInServlet extends HttpServlet {
             String name = request.getParameter("name");
             String password = request.getParameter("password");
 
-            if (sistema.validarUsuario(name, password)) {
-                DtUsuario usuario = sistema.getUsuario(name);
+            if (ws.validarUsuario(name, password)) {
+                DtUsuario usuario = ws.getUsuario(name);
 
                 // Crea sesión aquí, solo si válido
                 HttpSession session = request.getSession(true);
 
                 session.setAttribute("usuarioNickname", usuario.getNickname());
 
-                String basePath = request.getServletContext().getRealPath("/pictures/users");
+                String basePath = getServletContext().getRealPath("/pictures/users");
                 String contextPath = request.getContextPath();
 
                 String urlImagen = usuario.getUrlImage();
