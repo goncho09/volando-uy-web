@@ -12,7 +12,15 @@
     <name>Volando Web</name>
 
     <dependencies>
+        <!-- Servlet API (solo como provided, Tomcat la provee) -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- JSTL -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
@@ -25,17 +33,11 @@
             <version>1.2</version>
         </dependency>
 
+        <!-- SOAP / JAX-WS -->
         <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
             <version>2.3.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -44,6 +46,7 @@
             <version>2.3.3</version>
         </dependency>
 
+        <!-- JAXB -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -56,6 +59,7 @@
             <version>2.3.3</version>
         </dependency>
 
+        <!-- Commons IO -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -63,19 +67,30 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <finalName>volando-uy-backend</finalName>
+
         <plugins>
+            <!-- Compilador -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <!-- WAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
             </plugin>
+
+            <!-- JAX-WS wsimport -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
@@ -88,41 +103,14 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- URL O RUTA DEL WSDL -->
                     <wsdlUrls>
                         <wsdlUrl>http://localhost:8081/volando/soap?wsdl</wsdlUrl>
                     </wsdlUrls>
-
-                    <!-- Package donde se generará el cliente SOAP -->
                     <packageName>uy.volando.soap.client</packageName>
-
-                    <!-- Mantener archivos generados -->
                     <keep>true</keep>
-
-                    <!-- Directorio donde se generan -->
                     <sourceDestDir>${project.build.directory}/generated-sources/wsimport</sourceDestDir>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>9</source>
-                    <target>9</target>
-                </configuration>
-            </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>

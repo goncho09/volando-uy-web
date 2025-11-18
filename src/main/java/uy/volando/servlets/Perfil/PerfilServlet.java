@@ -8,12 +8,10 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 
 
@@ -69,7 +67,6 @@ public class PerfilServlet extends HttpServlet {
                         break;
                     }
                 }
-                System.out.println(sigue);
                 if (userNickname.equals(nickname)) {
                     modificar = true;
                 }
@@ -77,8 +74,10 @@ public class PerfilServlet extends HttpServlet {
 
             DtAerolinea aerolinea = null;
             try{
-                aerolinea = ws.getAerolinea(nickname);
-            }  catch (Exception ignored) {}
+                aerolinea = ws.getAerolinea(nickname); // Esto debería ser una funcion llamada "esAerolinea" que devuelva true o false.
+            }  catch (Exception ignored) {
+
+            }
 
             if (aerolinea != null) {
                 request.setAttribute("aerolinea", aerolinea);
@@ -123,7 +122,16 @@ public class PerfilServlet extends HttpServlet {
             Part imagePart = request.getPart("image");
             String nombre = request.getParameter("nombre");
 
-            byte[] data = imagePart.getInputStream().readAllBytes();
+            InputStream inputStream = imagePart.getInputStream();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int nRead;
+            byte[] temp = new byte[1024];
+            while ((nRead = inputStream.read(temp, 0, temp.length)) != -1) {
+                buffer.write(temp, 0, nRead);
+            }
+            buffer.flush();
+            byte[] data = buffer.toByteArray();
+            inputStream.close();
 
             String fotoPerfil = ws.guardarImagen(data, TipoImagen.USUARIO);
             usuario.setNombre(nombre);

@@ -62,7 +62,7 @@
                             <td class="px-4 py-2 text-center">${reserva.fecha}</td>
                             <td class="px-4 py-2 text-center">${reserva.equipajeExtra}</td>
                             <td class="px-4 py-2 text-center">${reserva.tipoAsiento}</td>
-                            <td class="px-4 py-2 text-center">${reserva.vuelo}</td>
+                            <td class="px-4 py-2 text-center">${reserva.vuelo.nombre}</td>
                             <td class="px-4 py-2 text-center">${reserva.metodoPago}</td>
 
                             <c:if test="${usuarioTipo != null && usuarioTipo == 'aerolinea'}">

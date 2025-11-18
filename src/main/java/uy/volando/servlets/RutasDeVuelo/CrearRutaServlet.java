@@ -8,6 +8,7 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -179,7 +180,16 @@ public class CrearRutaServlet extends HttpServlet {
                 return;
             }
 
-            byte[] data = filePart.getInputStream().readAllBytes();
+            InputStream inputStream = filePart.getInputStream();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int nRead;
+            byte[] temp = new byte[1024];
+            while ((nRead = inputStream.read(temp, 0, temp.length)) != -1) {
+                buffer.write(temp, 0, nRead);
+            }
+            buffer.flush();
+            byte[] data = buffer.toByteArray();
+            inputStream.close();
 
             String imagen = ws.guardarImagen(data, TipoImagen.RUTA);
 

@@ -18,6 +18,7 @@ import uy.volando.servlets.RutasDeVuelo.BuscarRutaServlet;
 import uy.volando.soap.ControladorWS;
 import uy.volando.soap.client.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -146,7 +147,16 @@ public class CrearVueloServlet extends HttpServlet {
                 return;
             }
 
-            byte[] data = filePart.getInputStream().readAllBytes();
+            InputStream inputStream = filePart.getInputStream();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int nRead;
+            byte[] temp = new byte[1024];
+            while ((nRead = inputStream.read(temp, 0, temp.length)) != -1) {
+                buffer.write(temp, 0, nRead);
+            }
+            buffer.flush();
+            byte[] data = buffer.toByteArray();
+            inputStream.close();
 
             String imagen = ws.guardarImagen(data, TipoImagen.VUELO);
 

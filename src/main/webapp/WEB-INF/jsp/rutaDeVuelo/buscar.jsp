@@ -51,12 +51,12 @@
                             <div class="flex items-center">
                                 <i class="fas fa-map-marker-alt text-[#1d6e86] mr-2"></i>
                                 <span class="font-semibold text-[#0c2636]">Origen:</span>
-                                <span class="ml-2 text-gray-700">${ruta.ciudadOrigen}</span>
+                                <span class="ml-2 text-gray-700">${ruta.ciudadOrigen.nombre}</span>
                             </div>
                             <div class="flex items-center">
                                 <i class="fas fa-map-marker-alt text-[#1d6e86] mr-2"></i>
                                 <span class="font-semibold text-[#0c2636]">Destino:</span>
-                                <span class="ml-2 text-gray-700">${ruta.ciudadDestino}</span>
+                                <span class="ml-2 text-gray-700">${ruta.ciudadDestino.nombre}</span>
                             </div>
                             <div class="flex items-center">
                                 <i class="fas fa-clock text-[#1d6e86] mr-2"></i>

@@ -12,12 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 
 @MultipartConfig
 @WebServlet(name = "RegistrarUsuario", urlPatterns = {"/register","/signup","/registrar"})
@@ -88,9 +84,19 @@ public class RegistrarUsuarioServlet extends HttpServlet {
                 return;
             }
 
-            byte[] data = filePart.getInputStream().readAllBytes();
+            InputStream inputStream = filePart.getInputStream();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int nRead;
+            byte[] temp = new byte[1024];
+            while ((nRead = inputStream.read(temp, 0, temp.length)) != -1) {
+                buffer.write(temp, 0, nRead);
+            }
+            buffer.flush();
+            byte[] data = buffer.toByteArray();
+            inputStream.close();
 
             String fotoPerfil = ws.guardarImagen(data, TipoImagen.USUARIO);
+
 
             HttpSession session = request.getSession(true);
 
