@@ -1,5 +1,6 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -20,11 +21,9 @@
 
 <main class="flex flex-col mt-5 bg-white mx-auto w-3/4 p-5 rounded shadow">
 
-    <c:if test="${not empty error}">
-        <div class="text-red-500 text-lg my-2 text-center justify-center">
-                ${error}
-        </div>
-    </c:if>
+
+
+
     <c:if test="${not empty usuarioPerfil}">
         <div class="w-full flex items-center justify-between mb-3">
             <h3 class="text-3xl text-black font-bold">Mi perfil</h3>
@@ -34,7 +33,7 @@
             </c:if>
 
             <c:if test="${usuarioNickname != null && modificar != true && sigue == false}">
-                <form action="${pageContext.request.contextPath}/seguir?nickname=${usuarioPerfil.nickname}" method="post">
+                <form id="seguir-usuario">
                 <button
                         type="submit"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -44,7 +43,7 @@
             </c:if>
 
             <c:if test="${usuarioNickname != null && modificar != true && sigue == true}">
-                <form action="${pageContext.request.contextPath}/dejar-de-seguir?nickname=${usuarioPerfil.nickname}" method="post">
+                <form id="dejar-de-seguir-usuario">
                     <button
                             onclick="location.href='${pageContext.request.contextPath}/}'"
                             class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
@@ -53,13 +52,6 @@
                 </form>
 
             </c:if>
-        </div>
-        <!-- Error global si hay -->
-        <div class="text-red-500 text-lg my-2 hidden text-center justify-center" id="errorMsg"></div>
-
-        <!-- Mensaje de éxito si hay -->
-        <div class="text-green-500 text-lg my-2 hidden text-center justify-center" id="successMsg">
-            Perfil actualizado con éxito.
         </div>
 
         <form id="formModificar" class="flex flex-col bg-white w-full">
@@ -244,8 +236,15 @@
 
                     </c:choose>
                 </div>
+
             </div>
         </form>
+        <div id="error-msg" class="text-red-500 text-lg my-2 text-center justify-center hidden">
+        </div>
+
+        <div id="success-msg" class="text-green-500 text-lg my-2 text-center justify-center hidden">
+            Perfil actualizado con éxito.
+        </div>
         <c:if test="${modificar == true}">
            <div class="flex flex-col w-full space-y-2">
                <label>Lista de seguidos:</label>
@@ -282,7 +281,7 @@
 
 </main>
 
-<script>
+<script defer>
 
 
     const formModificar = document.getElementById("formModificar");
@@ -293,12 +292,12 @@
     const buttonModificarClienteContainer = document.getElementById("buttonModificarClienteContainer");
     const buttonModificarAerolineaContainer = document.getElementById("buttonModificarAerolineaContainer");
     const buttonGuardarContainer = buttonModificarClienteContainer || buttonModificarAerolineaContainer;
-    const errorMsg = document.getElementById("errorMsg");
-    const successMsg = document.getElementById("successMsg");
+    const errorMsg = document.getElementById("error-msg");
+    const successMsg = document.getElementById("success-msg");
     const selectTipoDocumento = document.getElementById("selectTipoDocumento");
 
     // --- Preview de imagen ---
-    inputImagen?.addEventListener("change", (event) => {
+    inputImagen.addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -311,7 +310,7 @@
 
     let modificando = false;
 
-    modificarButton?.addEventListener("click", () => {
+    modificarButton.addEventListener("click", () => {
         modificando = !modificando;
 
         seleccionarImagenContainer?.classList.toggle("!flex", modificando);
@@ -326,8 +325,7 @@
 
         inputs.forEach(input => {
             input.readOnly = !modificando;
-            input.classList.toggle("bg-green-200", modificando);
-            input.classList.toggle("indent-1", modificando);
+            input.classList.toggle("bg-green-100", modificando);
         });
 
         spans.forEach(span => {
@@ -335,7 +333,7 @@
         });
     });
 
-    formModificar?.addEventListener("submit", async (e) => {
+    formModificar.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         if (!modificando) {
@@ -347,14 +345,16 @@
         const formData = new FormData(formModificar);
 
         try {
-            const response = await fetch(`${contextPath}/perfil?nickname=${usuarioNickname}`, {
+            const response = await fetch(`${pageContext.request.contextPath}/perfil?nickname=${usuarioNickname}`, {
                 method: "POST",
                 body: formData
             });
 
             if (response.ok) {
-                successMsg.classList.remove("hidden");
-                setTimeout(() => window.location.reload(), 1000);
+                setTimeout(() => {
+                    successMsg.classList.remove("hidden");
+                    window.location.reload();
+                }, 2000);
             } else {
                 const errorText = await response.text();
                 errorMsg.textContent = errorText || "Error al actualizar el perfil.";
@@ -366,6 +366,10 @@
         }
     });
 
+
+</script>
+
+<script defer>
     const botonSeguido = document.getElementById("verPerfilSeguidoBtn");
     const botonSeguidor = document.getElementById("verPerfilSeguidorBtn");
     const selectSeguidos = document.getElementById("selectSeguidos");
@@ -384,6 +388,51 @@
     });
 </script>
 
+<script defer>
+    const formSeguir = document.getElementById("seguir-usuario");
+    const formDejarDeSeguir = document.getElementById("dejar-de-seguir-usuario");
+    const errorMsg = document.getElementById("error-msg");
+
+    formSeguir.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch(`${pageContext.request.contextPath}/seguir?nickname=${usuarioPerfil.nickname}`, {
+                method: "POST"
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                errorMsg.textContent = "Error al seguir al usuario.";
+                errorMsg.classList.remove("hidden");
+            }
+        } catch (error) {
+            errorMsg.textContent = "Error en la conexión con el servidor.";
+            errorMsg.classList.remove("hidden");
+        }
+    });
+
+    formDejarDeSeguir.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch(`${pageContext.request.contextPath}/dejar-de-seguir?nickname=${usuarioPerfil.nickname}`, {
+                method: "POST"
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                errorMsg.textContent = "Error al dejar de seguir al usuario.";
+                errorMsg.classList.remove("hidden");
+            }
+        } catch (error) {
+            errorMsg.textContent = "Error en la conexión con el servidor.";
+            errorMsg.classList.remove("hidden");
+        }
+    });
+</script>
 
 </body>
 </html>

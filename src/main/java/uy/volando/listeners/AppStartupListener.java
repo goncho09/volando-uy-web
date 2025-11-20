@@ -20,11 +20,7 @@ public class AppStartupListener implements ServletContextListener {
 
             VolandoServicePort ws = ControladorWS.getPort();
 
-            List <DtAerolinea> aerolineas = ws.listarAerolineas();
-            aerolineas.removeIf(aerolinea -> aerolinea.getRutasDeVuelo().isEmpty());
-
             sce.getServletContext().setAttribute("categorias", ws.listarCategorias());
-            sce.getServletContext().setAttribute("aerolineasConRuta",aerolineas);
 
         } catch (Exception e) {
             System.err.println("¡Error al cargar los datos iniciales!");

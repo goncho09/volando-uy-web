@@ -2,15 +2,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volando.uy | Iniciar sesión</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css">
 </head>
 <body>
@@ -24,13 +21,13 @@
         <div
                 class="flex w-[90%] md:w-2/3 items-center border-b border-gray-300 py-2 space-x-3 focus-within:border-[var(--azul-oscuro)]">
             <i class="fa fa-user icon text-[var(--azul-oscuro)]"></i>
-            <input type="text" name="name" placeholder="Ingrese su nickname" required
+            <input type="text" name="name" id="name" placeholder="Ingrese su nickname" required
                    class="flex-grow outline-none">
         </div>
         <div
                 class="flex w-[90%] md:w-2/3 items-center border-b border-gray-300 py-2 space-x-3 focus-within:border-[var(--azul-oscuro)]">
             <i class="fa fa-lock icon text-[var(--azul-oscuro)]"></i>
-            <input type="password" name="password" placeholder="Ingrese su contraseña" required
+            <input type="password" id="password" name="password" placeholder="Ingrese su contraseña" required
                    class="flex-grow outline-none">
         </div>
 
@@ -51,11 +48,16 @@
     </form>
 </div>
 
-<script>
-    document.getElementById('login-form').addEventListener('submit',async(e) => {
+<script defer>
+    const loginForm = document.getElementById('login-form')
+    loginForm.addEventListener('submit',async(e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const params = new URLSearchParams(formData);
+
+        const params = new URLSearchParams();
+        params.append("name", document.getElementById("name").value);
+        params.append("password", document.getElementById("password").value);
+
+
         const errorMsg = document.getElementById("error-msg");
         const button = e.target.querySelector('button[type="submit"]');
         button.disabled = true;
@@ -68,9 +70,6 @@
         const response = await fetch('${pageContext.request.contextPath}/login', {
             method: 'POST',
             body: params,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
         });
 
         const text = await response.text();

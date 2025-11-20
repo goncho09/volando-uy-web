@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "BuscarVueloServlet", urlPatterns = {"/perfil/buscar"})
+@WebServlet(name = "BuscarPerfilServlet", urlPatterns = {"/perfil/buscar"})
 public class BuscarPerfilServlet extends HttpServlet {
     VolandoServicePort ws = ControladorWS.getPort();
 

@@ -14,15 +14,14 @@ import java.util.List;
 
 @WebServlet(name = "BuscarVueloServlet", urlPatterns = {"/vuelo/buscar"})
 public class BuscarVueloServlet extends HttpServlet {
+
     VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
 
-            System.out.println("entrado al servlet buscar vuelo");
             List<DtAerolinea> aerolineas = ws.listarAerolineas();
 
             aerolineas.removeIf(aerolinea -> {

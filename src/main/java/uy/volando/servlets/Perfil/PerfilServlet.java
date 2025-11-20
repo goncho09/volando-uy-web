@@ -72,17 +72,13 @@ public class PerfilServlet extends HttpServlet {
                 }
             }
 
-            DtAerolinea aerolinea = null;
-            try{
-                aerolinea = ws.getAerolinea(nickname); // Esto debería ser una funcion llamada "esAerolinea" que devuelva true o false.
-            }  catch (Exception ignored) {
+            String tipoUsuario = ws.getTipoUsuario(nickname);
 
-            }
-
-            if (aerolinea != null) {
+            if (tipoUsuario.equals("Aerolinea")) {
+                DtAerolinea aerolinea = ws.getAerolinea(nickname);
                 request.setAttribute("aerolinea", aerolinea);
                 request.setAttribute("usuarioTipoPerfil","aerolinea");
-            } else {
+            } else if (tipoUsuario.equals("Cliente")){
                 DtCliente cliente = ws.getCliente(nickname);
                 request.setAttribute("cliente", cliente);
                 request.setAttribute("usuarioTipoPerfil","cliente");
@@ -114,6 +110,10 @@ public class PerfilServlet extends HttpServlet {
             return;
         }
 
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+
         try {
             String usuarioTipo = (String) session.getAttribute("usuarioTipo");
             String nickname = (String) session.getAttribute("usuarioNickname");
@@ -138,33 +138,22 @@ public class PerfilServlet extends HttpServlet {
             usuario.setUrlImage(fotoPerfil);
 
             if (usuarioTipo.equals("cliente")) {
-
                 String apellido = request.getParameter("apellido");
                 String fechaNacimiento = request.getParameter("fechaNacimiento");
                 String nacionalidad = request.getParameter("nacionalidad");
                 String tipoDocumento = request.getParameter("tipoDocumento");
                 String numeroDocumento = request.getParameter("numeroDocumento");
 
-                LocalDate fechaNacDate = null;
-                try {
-                    fechaNacDate = LocalDate.parse(fechaNacimiento);
-                } catch (Exception e) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("ERROR: Fecha de nacimiento inválida");
-                    request.setAttribute("error", "Fecha de nacimiento inválida");
-                    System.out.println(">>> PerfilServlet POST: Error al setear datos usuario = " + e.getMessage());
-                }
-
-                TipoDocumento tipoDocumentoEnum = null;
-                int numDoc = 0;
+                TipoDocumento tipoDocumentoEnum;
+                int numDoc;
                 try {
                     tipoDocumentoEnum = TipoDocumento.valueOf(tipoDocumento);
                     numDoc = Integer.parseInt(numeroDocumento);
                 } catch (Exception e) {
-                    request.setAttribute("error", "Tipo o número de documento inválido");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("ERROR: Tipo o número de documento inválido");
+                    request.setAttribute("error", "Tipo o número de documento inválido");
                     System.out.println(">>> PerfilServlet POST: Error al setear datos usuario = " + e.getMessage());
+                    return;
                 }
 
                 DtCliente clienteModify = new DtCliente();
@@ -174,7 +163,7 @@ public class PerfilServlet extends HttpServlet {
                 clienteModify.setEmail(usuario.getEmail());
                 clienteModify.setUrlImage(usuario.getUrlImage());
                 clienteModify.setApellido(apellido);
-                clienteModify.setFechaNacimiento(fechaNacDate.toString());
+                clienteModify.setFechaNacimiento(fechaNacimiento);
                 clienteModify.setNacionalidad(nacionalidad);
                 clienteModify.setTipoDocumento(tipoDocumentoEnum);
                 clienteModify.setNumeroDocumento(numDoc);
@@ -183,7 +172,6 @@ public class PerfilServlet extends HttpServlet {
             } else if (usuarioTipo.equals("aerolinea")) {
                 String descripcion = request.getParameter("descripcion");
                 String linkWeb = request.getParameter("linkWeb");
-
                 DtAerolinea aerolineaModify = new DtAerolinea();
 
                 aerolineaModify.setNickname(usuario.getNickname());
@@ -200,18 +188,11 @@ public class PerfilServlet extends HttpServlet {
             DtUsuario updatedUsuario = ws.getUsuario(nickname);
             session.setAttribute("usuario", updatedUsuario);
             session.setAttribute("usuarioImagen", updatedUsuario.getUrlImage());
-            request.setAttribute("success", "Perfil actualizado correctamente");
-
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("OK");
-            request.getRequestDispatcher("/WEB-INF/jsp/perfil/perfil.jsp").forward(request, response);
-
         } catch (Exception e) {
             System.out.println(">>> PerfilServlet POST: Error = " + e.getMessage());
-            request.setAttribute("error", "Error del servidor");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", "Error al actualizar perfil");
-            request.getRequestDispatcher("/WEB-INF/jsp/perfil/perfil.jsp").forward(request, response);
+            response.getWriter().write("Error al actualizar perfil.");
         }
 
     }

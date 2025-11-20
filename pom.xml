@@ -11,6 +11,12 @@
 
     <name>Volando Web</name>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <file.encoding>UTF-8</file.encoding>
+    </properties>
+
     <dependencies>
         <!-- Servlet API (solo como provided, Tomcat la provee) -->
         <dependency>
@@ -27,11 +33,11 @@
             <version>1.2</version>
         </dependency>
 
-        <dependency>
+       <!-- <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jstl-impl</artifactId>
             <version>1.2</version>
-        </dependency>
+        </dependency>-->
 
         <!-- SOAP / JAX-WS -->
         <dependency>

@@ -31,10 +31,6 @@ public class LogInServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
-        response.setDateHeader("Expires", 0);
-
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("usuarioNickname") != null) {
             response.sendRedirect(request.getContextPath() + "/home");
@@ -45,17 +41,29 @@ public class LogInServlet extends HttpServlet {
 
     }
 
+
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         try {
             String name = request.getParameter("name");
             String password = request.getParameter("password");
 
-            if (ws.validarUsuario(name, password)) {
-                DtUsuario usuario = ws.getUsuario(name);
+            System.out.println("1");
 
+            System.out.println("nombre " + name + " pass " + password);
+            System.out.println("valida " + ws.validarUsuario(name, password));
+            if (ws.validarUsuario(name, password)) {
+                System.out.println("1.5");
+                DtUsuario usuario = ws.getUsuario(name);
+                System.out.println("1.8");
                 // Crea sesión aquí, solo si válido
                 HttpSession session = request.getSession(true);
+
+                System.out.println("2");
 
                 session.setAttribute("usuarioNickname", usuario.getNickname());
 
@@ -64,6 +72,8 @@ public class LogInServlet extends HttpServlet {
 
                 String urlImagen = usuario.getUrlImage();
                 File userImg = null;
+
+                System.out.println("3");
 
                 if (urlImagen != null && !urlImagen.isEmpty()) {
                     userImg = new File(basePath, urlImagen);
@@ -74,7 +84,7 @@ public class LogInServlet extends HttpServlet {
                 } else {
                     usuario.setUrlImage(contextPath + "/pictures/users/" + urlImagen);
                 }
-
+                System.out.println("4");
 
                 session.setAttribute("usuarioImagen", usuario.getUrlImage());
 
@@ -89,6 +99,8 @@ public class LogInServlet extends HttpServlet {
                     return;
                 }
 
+                System.out.println("5");
+
                 session.setAttribute("usuario", usuario);
 
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -100,9 +112,9 @@ public class LogInServlet extends HttpServlet {
             }
 
         } catch (Exception ex) {
-            request.setAttribute("error", "Error en el servidor");
-            System.out.println(">>> LogIn doPost: Excepción = " + ex.getMessage());  // Debug
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("Error al iniciar sesión. Inténtelo de nuevo más tarde.");
+            System.out.println(">>> LogIn doPost: Excepción = " + ex.getMessage());  // Debug
         }
     }
 }
