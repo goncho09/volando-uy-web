@@ -26,7 +26,6 @@ public class AppStartupListener implements ServletContextListener {
 
         } catch (Exception e) {
             System.err.println("¡Error al cargar los datos iniciales!");
-            e.printStackTrace();
         }
     }
 

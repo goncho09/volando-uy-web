@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
 
 
 @MultipartConfig
@@ -146,20 +145,23 @@ public class PerfilServlet extends HttpServlet {
             Part imagePart = request.getPart("image");
             String nombre = request.getParameter("nombre");
 
-            InputStream inputStream = imagePart.getInputStream();
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            int nRead;
-            byte[] temp = new byte[1024];
-            while ((nRead = inputStream.read(temp, 0, temp.length)) != -1) {
-                buffer.write(temp, 0, nRead);
-            }
-            buffer.flush();
-            byte[] data = buffer.toByteArray();
-            inputStream.close();
+            if(imagePart != null && imagePart.getSize() > 0){
+                InputStream inputStream = imagePart.getInputStream();
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] temp = new byte[1024];
+                while ((nRead = inputStream.read(temp, 0, temp.length)) != -1) {
+                    buffer.write(temp, 0, nRead);
+                }
+                buffer.flush();
+                byte[] data = buffer.toByteArray();
+                inputStream.close();
 
-            String fotoPerfil = ws.guardarImagen(data, TipoImagen.USUARIO);
+                String fotoPerfil = ws.guardarImagen(data, TipoImagen.USUARIO);
+                usuario.setUrlImage(fotoPerfil);
+            }
+
             usuario.setNombre(nombre);
-            usuario.setUrlImage(fotoPerfil);
 
             if (usuarioTipo.equals("cliente")) {
                 String apellido = request.getParameter("apellido");
