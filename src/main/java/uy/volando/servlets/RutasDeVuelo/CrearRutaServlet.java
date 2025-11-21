@@ -32,10 +32,14 @@ public class CrearRutaServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null) {
+        Boolean esMobile = (Boolean) session.getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
             return;
         }
+
 
         if (session.getAttribute("usuarioTipo") == null || session.getAttribute("usuarioNickname") == null) {
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
@@ -68,6 +72,21 @@ public class CrearRutaServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String userAgent = request.getHeader("User-Agent");
+
+        boolean esMobile = userAgent != null && (
+                userAgent.contains("Mobile") ||
+                        userAgent.contains("Android") ||
+                        userAgent.contains("iPhone") ||
+                        userAgent.contains("iPad")
+        );
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
 
         response.setContentType("text/plain;charset=UTF-8");
         try {
@@ -231,10 +250,7 @@ public class CrearRutaServlet extends HttpServlet {
             response.getWriter().write("Ruta de vuelo creada con éxito");
 
         } catch (Exception ex) {
-        System.err.println("=== ERROR DETALLADO ===");
         System.err.println("Error en CrearRutaServlet (POST): " + ex.getMessage());
-
-        System.err.println("=== FIN ERROR ===");
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         response.getWriter().write("Error: " + ex.getMessage());
     }

@@ -43,10 +43,14 @@ public class CrearVueloServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null) {
+        Boolean esMobile = (Boolean) request.getSession(false).getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
             return;
         }
+
 
         if(session.getAttribute("usuarioTipo") == null || session.getAttribute("usuarioNickname") == null || !"aerolinea".equals(session.getAttribute("usuarioTipo"))) {
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
@@ -83,6 +87,14 @@ public class CrearVueloServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        Boolean esMobile = (Boolean) request.getSession(false).getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
 
         response.setContentType("text/plain;charset=UTF-8");
         try {

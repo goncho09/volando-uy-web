@@ -20,6 +20,8 @@ public class AppStartupListener implements ServletContextListener {
 
             VolandoServicePort ws = ControladorWS.getPort();
 
+
+
             sce.getServletContext().setAttribute("categorias", ws.listarCategorias());
 
         } catch (Exception e) {

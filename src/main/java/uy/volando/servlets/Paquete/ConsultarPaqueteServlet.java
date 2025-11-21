@@ -25,6 +25,15 @@ public class ConsultarPaqueteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        Boolean esMobile = (Boolean) request.getSession(false).getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
+
+
         try{
             String nombre = request.getParameter("nombre");
 

@@ -23,12 +23,36 @@ public class RegistrarUsuarioServlet extends HttpServlet {
     protected void doGet(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
             throws javax.servlet.ServletException, java.io.IOException {
 
+        String userAgent = request.getHeader("User-Agent");
+
+        boolean esMobile = userAgent != null && (
+                userAgent.contains("Mobile") ||
+                        userAgent.contains("Android") ||
+                        userAgent.contains("iPhone") ||
+                        userAgent.contains("iPad")
+        );
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
+
         request.getRequestDispatcher("/WEB-INF/jsp/signup/registrarUsuario.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
             throws javax.servlet.ServletException, java.io.IOException {
+
+
+        Boolean esMobile = (Boolean) request.getSession(false).getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
 
         response.setContentType("text/plain;charset=UTF-8");
 

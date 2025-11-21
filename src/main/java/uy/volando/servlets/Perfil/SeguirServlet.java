@@ -22,7 +22,15 @@ public class SeguirServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("usuarioNickname") == null || session.getAttribute("usuarioTipo") == null) {
+        Boolean esMobile = (Boolean) request.getSession(false).getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
+
+        if (session.getAttribute("usuarioNickname") == null || session.getAttribute("usuarioTipo") == null) {
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
             return;
         }

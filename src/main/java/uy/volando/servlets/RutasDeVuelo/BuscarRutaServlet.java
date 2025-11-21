@@ -29,7 +29,14 @@ public class BuscarRutaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        System.out.println(">>> BuscarRutaServlet: Session = " + (session != null ? "OK" : "NULL"));  // Debug temporal
+
+        Boolean esMobile = (Boolean) session.getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
 
         try {
             String nombreRuta = request.getParameter("nombre");

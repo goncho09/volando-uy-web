@@ -18,6 +18,21 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
     protected void doGet(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
             throws javax.servlet.ServletException, java.io.IOException {
 
+        String userAgent = request.getHeader("User-Agent");
+
+        boolean esMobile = userAgent != null && (
+                userAgent.contains("Mobile") ||
+                        userAgent.contains("Android") ||
+                        userAgent.contains("iPhone") ||
+                        userAgent.contains("iPad")
+        );
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
+
         request.getRequestDispatcher("/WEB-INF/jsp/signup/registrarUsuarioFinal.jsp").forward(request, response);
     }
 
@@ -25,15 +40,19 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
     protected void doPost(javax.servlet.http.HttpServletRequest request, HttpServletResponse response)
             throws javax.servlet.ServletException, java.io.IOException {
 
+        HttpSession session = request.getSession(false);
+
+        Boolean esMobile = (Boolean) session.getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
+
         response.setContentType("text/plain;charset=UTF-8");
 
         try {
-            HttpSession session = request.getSession(false);
-            if (session == null) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("No se ha iniciado el registro correctamente.");
-                return;
-            }
 
             String tipoUsuario = (String) session.getAttribute("tipoUsuario");
             DtUsuario dtUsuarioTemp = (DtUsuario) session.getAttribute("datosUsuario");

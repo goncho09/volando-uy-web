@@ -23,12 +23,9 @@ public class VerRutasServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
 
-        if (session == null) {
-            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
-            return;
-        }
+
+        HttpSession session = request.getSession(false);
 
         if (session.getAttribute("usuarioTipo") == null || session.getAttribute("usuarioNickname") == null) {
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);

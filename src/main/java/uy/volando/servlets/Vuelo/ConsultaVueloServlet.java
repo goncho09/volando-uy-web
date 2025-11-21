@@ -22,8 +22,6 @@ public class ConsultaVueloServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
-
         try {
             String idVuelo = request.getParameter("nombre");
 

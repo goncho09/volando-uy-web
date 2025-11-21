@@ -22,6 +22,21 @@ public class ComprarPaqueteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        String userAgent = request.getHeader("User-Agent");
+
+        boolean esMobile = userAgent != null && (
+                userAgent.contains("Mobile") ||
+                        userAgent.contains("Android") ||
+                        userAgent.contains("iPhone") ||
+                        userAgent.contains("iPad")
+        );
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
+
         HttpSession session = request.getSession(false);
 
         if (session == null) {
@@ -66,7 +81,10 @@ public class ComprarPaqueteServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null) {
+        Boolean esMobile = (Boolean) session.getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
             return;
         }

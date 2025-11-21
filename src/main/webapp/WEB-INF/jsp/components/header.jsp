@@ -15,6 +15,7 @@
         <c:set var="usuarioNickname" value="${sessionScope.usuarioNickname}"/>
         <c:set var="usuarioTipo" value="${sessionScope.usuarioTipo}"/>
         <c:set var="usuarioImagen" value="${sessionScope.usuarioImagen}"/>
+        <c:set var="esMobile" value="${sessionScope.esMobile}"/>
 
         <c:choose>
             <c:when test="${usuarioNickname != null}">

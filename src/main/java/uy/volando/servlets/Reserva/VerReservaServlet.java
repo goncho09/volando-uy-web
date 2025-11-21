@@ -25,11 +25,6 @@ public class VerReservaServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null) {
-            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
-            return;
-        }
-
         if (session.getAttribute("usuarioTipo") == null || session.getAttribute("usuarioNickname") == null) {
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
             return;
