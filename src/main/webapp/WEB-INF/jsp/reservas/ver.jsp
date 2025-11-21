@@ -11,7 +11,7 @@
     <!-- Librerias Header -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css"/>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
 
@@ -21,7 +21,7 @@
 
 <jsp:include page="../components/header.jsp"/>
 
-<c:set var="tipoUsuario" value="${sessionScope.tipoUsuario}" />
+<c:set var="tipoUsuario" value="${sessionScope.tipoUsuario}"/>
 
 <main class="flex flex-col items-center md:items-start md:flex-row max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8 justify-center  mt-5">
 
@@ -56,7 +56,7 @@
                     <tbody>
                     <c:forEach var="reserva" items="${reservas}">
                         <tr class="border-t border-[var(--azul-oscuro)] cursor-pointer hover:bg-blue-200"
-                            onclick="window.location='${pageContext.request.contextPath}/reservas/consulta?vuelo=${reserva.vuelo}&fecha=${reserva.fecha}'">
+                            onclick="window.location='${pageContext.request.contextPath}/reservas/consulta?vuelo=${reserva.vuelo.nombre}&fecha=${reserva.fecha}'">
                             <td class="px-4 py-2 text-center">${reserva.cantPasajes}</td>
                             <td class="px-4 py-2 text-center">$${reserva.costo}</td>
                             <td class="px-4 py-2 text-center">${reserva.fecha}</td>
@@ -69,16 +69,23 @@
                                 <th class="px-4 py-2 text-center">${reserva.cliente}</th>
                             </c:if>
 
-                            <td class="text-center px-4 py-2  space-x-3">
-                                <a href="#" class="hover:scale-110 transition-transform">
-                                    <i class="fa fa-edit text-xl text-green-600"></i>
-                                </a>
-                                <form class="inline">
-                                    <input type="hidden" name="id" value="1">
-                                    <button type="submit" class="hover:scale-110 transition-transform">
-                                        <i class="fa fa-trash text-xl text-red-600"></i>
-                                    </button>
-                                </form>
+                            <td class="text-center px-4 py-2" onclick="event.stopPropagation();">
+                                <c:choose>
+                                    <c:when test="${reserva.checkin}">
+                                        <!-- Ya tiene check-in hecho → solo icono de confirmado (verde o rojo, vos elegís) -->
+                                        <span class="inline-block" title="Check-in realizado">
+                <i class="fa-solid fa-file-circle-check" style="color: #e23c12;" class="text-2xl"></i>
+            </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- Aún no tiene check-in → solo el ojo para entrar y hacerlo -->
+                                        <a href="${pageContext.request.contextPath}/reservas/detalle?vuelo=${reserva.vuelo.nombre}&fecha=${reserva.fecha}"
+                                           class="hover:scale-110 transition-transform inline-block"
+                                           title="Realizar check-in">
+                                            <i class="fa-solid fa-eye" style="color: #74C0FC;" class="text-2xl"></i>
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                         </tr>
                     </c:forEach>
@@ -86,7 +93,6 @@
                 </table>
             </div>
         </c:if>
-
 
 
     </section>
