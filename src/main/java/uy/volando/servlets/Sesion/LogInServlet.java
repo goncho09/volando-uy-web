@@ -52,18 +52,12 @@ public class LogInServlet extends HttpServlet {
             String name = request.getParameter("name");
             String password = request.getParameter("password");
 
-            System.out.println("1");
-
-            System.out.println("nombre " + name + " pass " + password);
-            System.out.println("valida " + ws.validarUsuario(name, password));
             if (ws.validarUsuario(name, password)) {
-                System.out.println("1.5");
                 DtUsuario usuario = ws.getUsuario(name);
-                System.out.println("1.8");
+
                 // Crea sesión aquí, solo si válido
                 HttpSession session = request.getSession(true);
 
-                System.out.println("2");
 
                 session.setAttribute("usuarioNickname", usuario.getNickname());
 
@@ -73,7 +67,6 @@ public class LogInServlet extends HttpServlet {
                 String urlImagen = usuario.getUrlImage();
                 File userImg = null;
 
-                System.out.println("3");
 
                 if (urlImagen != null && !urlImagen.isEmpty()) {
                     userImg = new File(basePath, urlImagen);
@@ -84,7 +77,6 @@ public class LogInServlet extends HttpServlet {
                 } else {
                     usuario.setUrlImage(contextPath + "/pictures/users/" + urlImagen);
                 }
-                System.out.println("4");
 
                 session.setAttribute("usuarioImagen", usuario.getUrlImage());
 
@@ -98,8 +90,6 @@ public class LogInServlet extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(request, response);
                     return;
                 }
-
-                System.out.println("5");
 
                 session.setAttribute("usuario", usuario);
 
