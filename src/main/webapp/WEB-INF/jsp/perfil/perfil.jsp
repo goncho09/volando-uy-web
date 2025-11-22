@@ -196,7 +196,7 @@
                                 </div>
                                 <input type="text" class="flex-1 bg-transparent break-words truncate max-w-full"
                                        id="linkWeb" name="linkWeb" readonly
-                                       value="${aerolinea.linkWeb ? aerolinea.linkWeb : '-'}"/>
+                                       value="${empty aerolinea.linkWeb ? '-' : aerolinea.linkWeb}"/>
                             </div>
 
                             <div class="hidden w-full" id="buttonModificarAerolineaContainer">

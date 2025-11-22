@@ -32,7 +32,7 @@ public class LogInServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        if (session.getAttribute("usuarioNickname") != null && session.getAttribute("usuarioTipo") != null) {
+        if (session != null && session.getAttribute("usuarioNickname") != null && session.getAttribute("usuarioTipo") != null) {
             response.sendRedirect(request.getContextPath() + "/home");
             return;
         }

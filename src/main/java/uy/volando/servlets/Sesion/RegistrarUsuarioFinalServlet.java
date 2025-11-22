@@ -88,13 +88,29 @@ public class RegistrarUsuarioFinalServlet extends HttpServlet {
 
                 DtAerolinea nuevaAerolinea = new DtAerolinea();
 
+                System.out.println("|----------- Datos Usuario ------------|");
+                System.out.println("Nickname: " + dtUsuarioTemp.getNickname());
+                System.out.println("Nombre: " + dtUsuarioTemp.getNombre());
+                System.out.println("Email: " + dtUsuarioTemp.getEmail());
+                System.out.println("Pass: " + dtUsuarioTemp.getPassword());
+                System.out.println("UrlImage: " + dtUsuarioTemp.getUrlImage());
+
                 nuevaAerolinea.setNickname(dtUsuarioTemp.getNickname());
                 nuevaAerolinea.setNombre(dtUsuarioTemp.getNombre());
                 nuevaAerolinea.setEmail(dtUsuarioTemp.getEmail());
                 nuevaAerolinea.setPassword(dtUsuarioTemp.getPassword());
                 nuevaAerolinea.setUrlImage(dtUsuarioTemp.getUrlImage());
                 nuevaAerolinea.setDescripcion(descripcion);
-                nuevaAerolinea.setUrlImage(urlSitioWeb);
+                nuevaAerolinea.setLinkWeb(urlSitioWeb);
+
+                System.out.println("|----------- Registrando Aerolinea ------------|");
+                System.out.println("Nickname: " + nuevaAerolinea.getNickname());
+                System.out.println("Nombre: " + nuevaAerolinea.getNombre());
+                System.out.println("Email: " + nuevaAerolinea.getEmail());
+                System.out.println("Pass: " + nuevaAerolinea.getPassword());
+                System.out.println("UrlImage: " + nuevaAerolinea.getUrlImage());
+                System.out.println("Descripcion: " + nuevaAerolinea.getDescripcion());
+                System.out.println("LinkWeb: " + nuevaAerolinea.getLinkWeb());
 
                 ws.registrarAerolinea(nuevaAerolinea);
 

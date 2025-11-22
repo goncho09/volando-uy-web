@@ -134,6 +134,13 @@ public class RegistrarUsuarioServlet extends HttpServlet {
             datosUsuario.getSeguidos();
             datosUsuario.getSeguidores();
 
+            System.out.println("|----------- Registrando Usuario ------------|");
+            System.out.println("Nickname: " + datosUsuario.getNickname());
+            System.out.println("Nombre: " + datosUsuario.getNombre());
+            System.out.println("Email: " + datosUsuario.getEmail());
+            System.out.println("Pass: " + datosUsuario.getPassword());
+            System.out.println("UrlImage: " + datosUsuario.getUrlImage());
+
             session.setAttribute("datosUsuario", datosUsuario);
             session.setAttribute("tipoUsuario", tipoUsuario);
 
