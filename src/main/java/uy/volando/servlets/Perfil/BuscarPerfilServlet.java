@@ -31,7 +31,6 @@ public class BuscarPerfilServlet extends HttpServlet {
 
         try {
             List<DtUsuario> usuarios = ws.listarUsuarios();
-
             request.setAttribute("usuarios", usuarios);
 
             request.getRequestDispatcher("/WEB-INF/jsp/perfil/buscar.jsp").forward(request, response);

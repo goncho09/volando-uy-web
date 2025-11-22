@@ -19,8 +19,6 @@
 
 <jsp:include page="../components/header.jsp"/>
 
-<% System.out.println("jsp " + request.getAttribute("paquetes")); %>
-
 <main class="flex flex-col items-center md:items-start md:flex-row max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8 justify-center  mt-5">
 
     <section class="flex flex-col w-full bg-white p-6 rounded-lg shadow-lg mt-5 md:mt-0 md:ml-5">

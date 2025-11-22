@@ -75,7 +75,7 @@ public class PerfilServlet extends HttpServlet {
             if (session != null && session.getAttribute("usuarioNickname") != null && session.getAttribute("usuarioTipo") !=null){
                 String userNickname = (String) session.getAttribute("usuarioNickname");
                 DtUsuario user = ws.getUsuario(userNickname);
-                for (Usuario u : user.getSeguidos()) {
+                for (DtUsuario u : user.getSeguidos()) {
                     if (u.getNickname().equals(nickname)) {
                         sigue = true;
                         break;

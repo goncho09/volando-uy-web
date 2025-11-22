@@ -16,8 +16,8 @@
 <main id="main-content" class="flex flex-col items-center md:items-start md:flex-row max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8 justify-center  mt-5">
     <section class="flex flex-col items-center w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg mt-5 md:mt-0 md:ml-5">
         <h2 class="text-2xl font-bold mb-6 text-center text-[#12445d]">Buscar usuario</h2>
-    <select class="flex-grow outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100 whitespace-nowrap mt-3"
-            id="usuario" name="usuario" aria-label="Seleccione un usuario *" required>
+    <select class="w-1/3 outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100 whitespace-nowrap mt-3"
+            id="usuario-select" name="usuario" aria-label="Seleccione un usuario *" required>
         <option class="whitespace-nowrap" value="" disabled selected>
             Seleccione un usuario *
         </option>
@@ -28,11 +28,30 @@
         </c:forEach>
     </select>
     <button
-            class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-3"
-            onclick="location.href='${pageContext.request.contextPath}/perfil?nickname=' + document.getElementById('usuario').value">
+            id="btn-buscar"
+            class="w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-3">
         Buscar
     </button>
     </section>
 </main>
+
+<script defer>
+    const usuarioSelect = document.getElementById('usuario-select');
+    const buscarButton = document.getElementById('btn-buscar');
+
+    buscarButton.disabled = !usuarioSelect.value || usuarioSelect.value === "";
+
+    usuarioSelect.addEventListener('change', () => {
+        buscarButton.disabled = !usuarioSelect.value || usuarioSelect.value === "";
+    });
+
+    buscarButton.addEventListener('click', (event) => {
+        if (!usuarioSelect.value || usuarioSelect.value === "") {
+            event.preventDefault();
+        }
+        window.location.href = `${pageContext.request.contextPath}/perfil?nickname=` + usuarioSelect.value;
+    });
+
+</script>
 </body>
 </html>

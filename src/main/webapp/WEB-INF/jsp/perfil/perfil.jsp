@@ -45,7 +45,7 @@
             <c:if test="${usuarioNickname != null && modificar != true && sigue == true}">
                 <form id="dejar-de-seguir-usuario">
                     <button
-                            onclick="location.href='${pageContext.request.contextPath}/}'"
+                            type="submit"
                             class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                         Dejar de seguir
                     </button>
@@ -282,58 +282,54 @@
 </main>
 
 <script defer>
-
-
-    const formModificar = document.getElementById("formModificar");
-    const modificarButton = document.getElementById("modificarButton");
-    const seleccionarImagenContainer = document.getElementById("seleccionarImagenContainer");
-    const inputImagen = document.getElementById("inputImagen");
-    const previewImagen = document.getElementById("previewImagen");
-    const buttonModificarClienteContainer = document.getElementById("buttonModificarClienteContainer");
-    const buttonModificarAerolineaContainer = document.getElementById("buttonModificarAerolineaContainer");
-    const buttonGuardarContainer = buttonModificarClienteContainer || buttonModificarAerolineaContainer;
-    const errorMsg = document.getElementById("error-msg");
+    const errorMsg   = document.getElementById("error-msg");
     const successMsg = document.getElementById("success-msg");
-    const selectTipoDocumento = document.getElementById("selectTipoDocumento");
 
-    // --- Preview de imagen ---
-    inputImagen.addEventListener("change", (event) => {
-        const file = event.target.files[0];
+    // Modificar Perfil
+    const formModificar                = document.getElementById("formModificar");
+    const modificarButton              = document.getElementById("modificarButton");
+    const seleccionarImagenContainer   = document.getElementById("seleccionarImagenContainer");
+    const inputImagen                  = document.getElementById("inputImagen");
+    const previewImagen                = document.getElementById("previewImagen");
+    const buttonModificarClienteContainer   = document.getElementById("buttonModificarClienteContainer");
+    const buttonModificarAerolineaContainer = document.getElementById("buttonModificarAerolineaContainer");
+    const buttonGuardarContainer       = buttonModificarClienteContainer || buttonModificarAerolineaContainer;
+    const selectTipoDocumento          = document.getElementById("selectTipoDocumento");
+
+    let modificando = false;
+
+    // --- Preview imagen ---
+    inputImagen?.addEventListener("change", ({ target }) => {
+        const file = target.files?.[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                previewImagen.src = e.target.result;
-            };
+            reader.onload = e => previewImagen.src = e.target.result;
             reader.readAsDataURL(file);
         }
     });
 
-    let modificando = false;
-
-    modificarButton.addEventListener("click", () => {
+    // Mostrar para editar
+    modificarButton?.addEventListener("click", () => {
         modificando = !modificando;
 
         seleccionarImagenContainer?.classList.toggle("!flex", modificando);
         buttonGuardarContainer?.classList.toggle("!flex", modificando);
 
+        if (selectTipoDocumento) selectTipoDocumento.disabled = !modificando;
+
         const inputs = formModificar.querySelectorAll("input, select");
         const spans = formModificar.querySelectorAll("span");
 
-        if (selectTipoDocumento) {
-            selectTipoDocumento.disabled = false;
-        }
-
-        inputs.forEach(input => {
-            input.readOnly = !modificando;
-            input.classList.toggle("bg-green-100", modificando);
+        inputs.forEach(inpt => {
+            inpt.readOnly = !modificando;
+            inpt.classList.toggle("bg-green-100", modificando);
         });
 
-        spans.forEach(span => {
-            span.classList.toggle("text-green-600", modificando);
-        });
+        spans.forEach(sp => sp.classList.toggle("text-green-600", modificando));
     });
 
-    formModificar.addEventListener("submit", async (e) => {
+    // Form modificar
+    formModificar?.addEventListener("submit", async e => {
         e.preventDefault();
 
         if (!modificando) {
@@ -351,88 +347,65 @@
             });
 
             if (response.ok) {
-                setTimeout(() => {
-                    successMsg.classList.remove("hidden");
-                    window.location.reload();
-                }, 2000);
+                successMsg.classList.remove("hidden");
+                setTimeout(() => window.location.reload(), 1200);
             } else {
                 const errorText = await response.text();
                 errorMsg.textContent = errorText || "Error al actualizar el perfil.";
                 errorMsg.classList.remove("hidden");
             }
-        } catch (error) {
+        } catch {
             errorMsg.textContent = "Error en la conexión con el servidor.";
             errorMsg.classList.remove("hidden");
         }
     });
 
-
-</script>
-
-<script defer>
-    const botonSeguido = document.getElementById("verPerfilSeguidoBtn");
-    const botonSeguidor = document.getElementById("verPerfilSeguidorBtn");
-    const selectSeguidos = document.getElementById("selectSeguidos");
+    // Seguidos y Seguidores
+    const botonSeguido    = document.getElementById("verPerfilSeguidoBtn");
+    const botonSeguidor   = document.getElementById("verPerfilSeguidorBtn");
+    const selectSeguidos  = document.getElementById("selectSeguidos");
     const selectSeguidores = document.getElementById("selectSeguidores");
 
-    botonSeguido.addEventListener("click", () => {
-        const nickname = selectSeguidos.value;
-        if (nickname) window.location.href = `${pageContext.request.contextPath}/perfil?nickname=` + nickname;
-        else alert("Seleccione un usuario primero.");
-    });
+    const irAPerfil = nickname => {
+        if (nickname)
+            window.location.href = `${pageContext.request.contextPath}/perfil?nickname=` + nickname;
+        else
+            alert("Seleccione un usuario primero.");
+    };
 
-    botonSeguidor.addEventListener("click", () => {
-        const nickname = selectSeguidores.value;
-        if (nickname) window.location.href = `${pageContext.request.contextPath}/perfil?nickname=` + nickname;
-        else alert("Seleccione un usuario primero.");
-    });
-</script>
+    botonSeguido?.addEventListener("click", () => irAPerfil(selectSeguidos.value));
+    botonSeguidor?.addEventListener("click", () => irAPerfil(selectSeguidores.value));
 
-<script defer>
-    const formSeguir = document.getElementById("seguir-usuario");
-    const formDejarDeSeguir = document.getElementById("dejar-de-seguir-usuario");
-    const errorMsg = document.getElementById("error-msg");
+    const formSeguir          = document.getElementById("seguir-usuario");
+    const formDejarDeSeguir   = document.getElementById("dejar-de-seguir-usuario");
 
-    formSeguir.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
+    const enviarAccion = async url => {
         try {
-            const response = await fetch(`${pageContext.request.contextPath}/seguir?nickname=${usuarioPerfil.nickname}`, {
-                method: "POST"
-            });
-
+            const response = await fetch(url, { method: "POST" });
             if (response.ok) {
                 window.location.reload();
             } else {
-                errorMsg.textContent = "Error al seguir al usuario.";
+                errorMsg.textContent = "Error en la operación.";
                 errorMsg.classList.remove("hidden");
             }
-        } catch (error) {
+        } catch {
             errorMsg.textContent = "Error en la conexión con el servidor.";
             errorMsg.classList.remove("hidden");
         }
-    });
+    };
 
-    formDejarDeSeguir.addEventListener("submit", async (e) => {
+    formSeguir?.addEventListener("submit", e => {
         e.preventDefault();
-
-        try {
-            const response = await fetch(`${pageContext.request.contextPath}/dejar-de-seguir?nickname=${usuarioPerfil.nickname}`, {
-                method: "POST"
-            });
-
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                errorMsg.textContent = "Error al dejar de seguir al usuario.";
-                errorMsg.classList.remove("hidden");
-            }
-        } catch (error) {
-            errorMsg.textContent = "Error en la conexión con el servidor.";
-            errorMsg.classList.remove("hidden");
-        }
+        enviarAccion(`${pageContext.request.contextPath}/seguir?nickname=${usuarioPerfil.nickname}`);
     });
+
+    formDejarDeSeguir?.addEventListener("submit", e => {
+        e.preventDefault();
+        enviarAccion(`${pageContext.request.contextPath}/dejar-de-seguir?nickname=${usuarioPerfil.nickname}`);
+    });
+
 </script>
+
 
 </body>
 </html>

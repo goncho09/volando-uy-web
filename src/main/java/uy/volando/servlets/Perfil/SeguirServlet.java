@@ -14,6 +14,8 @@ import java.io.IOException;
 
 @WebServlet (name = "SeguirServlet", urlPatterns = {"/seguir","/follow"})
 public class SeguirServlet extends HttpServlet {
+
+
     VolandoServicePort ws = ControladorWS.getPort();
 
     @Override
@@ -39,8 +41,7 @@ public class SeguirServlet extends HttpServlet {
             String nicknameSeguir = request.getParameter("nickname");
             String nickname = (String) session.getAttribute("usuarioNickname");
             ws.seguirUsuario(nickname,nicknameSeguir);
-
-            response.sendRedirect(request.getContextPath() + "/perfil?nickname=" + nicknameSeguir);
+            response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
             request.setAttribute("error", "Error al seguir el usuario.");
             System.out.println(e.getMessage());
