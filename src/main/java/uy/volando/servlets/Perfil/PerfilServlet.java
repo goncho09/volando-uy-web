@@ -159,6 +159,7 @@ public class PerfilServlet extends HttpServlet {
 
                 String fotoPerfil = ws.guardarImagen(data, TipoImagen.USUARIO);
                 usuario.setUrlImage(fotoPerfil);
+                ws.modificarUsuarioImagen(usuario, usuario.getUrlImage());
             }
 
             usuario.setNombre(nombre);
@@ -212,6 +213,24 @@ public class PerfilServlet extends HttpServlet {
 
             // Actualiza session usuario
             DtUsuario updatedUsuario = ws.getUsuario(nickname);
+
+            String basePath = getServletContext().getRealPath("/pictures/users");
+            String contextPath = request.getContextPath();
+
+            String urlImagen = updatedUsuario.getUrlImage();
+            File userImg = null;
+
+
+            if (urlImagen != null && !urlImagen.isEmpty()) {
+                userImg = new File(basePath, urlImagen);
+            }
+
+            if (urlImagen == null || urlImagen.isEmpty() || !userImg.exists()) {
+                updatedUsuario.setUrlImage(contextPath + "/assets/userDefault.png");
+            } else {
+                updatedUsuario.setUrlImage(contextPath + "/pictures/users/" + urlImagen);
+            }
+
             session.setAttribute("usuario", updatedUsuario);
             session.setAttribute("usuarioImagen", updatedUsuario.getUrlImage());
             response.setStatus(HttpServletResponse.SC_OK);
