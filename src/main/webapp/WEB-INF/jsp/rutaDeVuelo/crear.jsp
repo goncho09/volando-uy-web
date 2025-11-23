@@ -126,6 +126,13 @@
                 </label>
             </div>
 
+            <!-- URL Video (opcional) -->
+            <div class="flex w-full items-center border-b border-gray-300 py-2 space-x-3 focus-within:border-[var(--azul-oscuro)]">
+                <i class="fa fa-video text-[var(--azul-oscuro)]"></i>
+                <input type="url" name="urlVideo" class="flex-grow outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100"
+                       placeholder="URL del video (opcional)" pattern="https?://.+">
+            </div>
+
             <!-- Mensajes de error y éxito -->
             <p id="error-msg" class="hidden text-red-600 text-base text-center transition-all duration-300 transform origin-top -translate-y-1 w-full"></p>
             <p id="success-msg" class="hidden text-green-600 text-base text-center transition-all duration-300 transform origin-top -translate-y-1 w-full ">

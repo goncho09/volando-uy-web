@@ -109,6 +109,7 @@ public class CrearRutaServlet extends HttpServlet {
             String ciudadDestinoStr = request.getParameter("ciudadDestino");
             String[] categoriasArray = request.getParameterValues("categorias");
             Part filePart = request.getPart("image");
+            String urlVideo = request.getParameter("urlVideo");
 
             // Validar campos obligatorios
             if (nombre == null || descripcionCorta == null || descripcion == null || horaStr == null ||
@@ -242,6 +243,10 @@ public class CrearRutaServlet extends HttpServlet {
             ruta.setCiudadOrigen(ciudadOrigen);
             ruta.setCiudadDestino(ciudadDestino);
 
+            // Agregar URL de video si fue proporcionada
+            if (urlVideo != null && !urlVideo.trim().isEmpty()) {
+                ruta.setUrlVideo(urlVideo.trim());
+            }
 
             // Usar el método del sistema para crear la ruta
             ws.altaRutaDeVuelo(nicknameAerolinea, ruta);
