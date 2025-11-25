@@ -135,7 +135,7 @@
             <c:if test="${empty resultados}">
                 <div class="col-span-full p-8 text-center">
                     <div class="p-6 rounded-2xl shadow-md bg-gray-100 border border-gray-200 inline-block">
-                        <h5 class="text-xl font-semibold text-gray-700">No se encontró ninguna oferta</h5>
+                        <h5 class="text-xl font-semibold text-gray-700">No se encontró ruta ni paquete.</h5>
                         <p class="text-gray-500 mt-2">Probá con otro término de búsqueda</p>
                     </div>
                 </div>

@@ -43,74 +43,86 @@ public class HomeServlet extends HttpServlet {
         try {
 
             String busqueda = request.getParameter("busqueda");
+            String orden = request.getParameter("orden");
+            String nombreFiltro = request.getParameter("nombre");
+
+            List<ListaResultados> resultados = new ArrayList<>();
+
+            String contextPath = request.getContextPath();
+            String basePathRutas = getServletContext().getRealPath("/pictures/rutas");
 
             if (busqueda != null && !busqueda.isEmpty()) {
 
                 if (ws.existeRuta(busqueda)) {
                     DtRuta ruta = ws.getRutaDeVuelo(busqueda);
-                    String basePath = getServletContext().getRealPath("/pictures/rutas");
-                    String contextPath = request.getContextPath();
 
                     String urlImagen = ruta.getUrlImagen();
-                    File rutaImg = null;
+                    File rutaImg = (urlImagen != null && !urlImagen.isEmpty())
+                            ? new File(basePathRutas, urlImagen)
+                            : null;
 
-                    if (urlImagen != null && !urlImagen.isEmpty()) {
-                        rutaImg = new File(basePath, urlImagen);
-                    }
-
-                    if (urlImagen == null || urlImagen.isEmpty() || !rutaImg.exists()) {
+                    if (urlImagen == null || urlImagen.isEmpty() || rutaImg == null || !rutaImg.exists()) {
                         ruta.setUrlImagen(contextPath + "/assets/rutaDefault.png");
                     } else {
                         ruta.setUrlImagen(contextPath + "/pictures/rutas/" + urlImagen);
                     }
-                    request.setAttribute("ruta", ruta);
 
+                    resultados.add(new ListaResultados(
+                            ruta.getNombre(),
+                            "Ruta",
+                            ruta
+                    ));
                 }
 
                 if (ws.existePaquete(busqueda)) {
                     DtPaquete paquete = ws.getPaquete(busqueda);
-                    request.setAttribute("paquete", paquete);
+                    resultados.add(new ListaResultados(
+                            paquete.getNombre(),
+                            "Paquete",
+                            paquete
+                    ));
                 }
+
+                request.setAttribute("esHome", false);
+
             } else {
+
                 request.getSession().setAttribute("usuario", null);
 
                 List<DtRuta> listaRuta = ws.listarRutasDeVuelo();
                 List<DtPaquete> listaPaquete = ws.listarPaquetesNoComprados();
 
-                listaRuta.removeIf(ruta -> ruta.getEstado() != EstadoRuta.APROBADA);
+                listaRuta.removeIf(r -> r.getEstado() != EstadoRuta.APROBADA);
 
-                for(DtPaquete p : listaPaquete){
-                    List<DtRutaEnPaquete> listaRutasPaquete = p.getRutaEnPaquete();
-                    listaRutasPaquete.removeIf(rutaEnPaquete -> rutaEnPaquete.getRutaDeVuelo().getEstado() != EstadoRuta.APROBADA);
-                }
-
-                listaPaquete.removeIf(paquete -> paquete.getRutaEnPaquete() == null || paquete.getRutaEnPaquete().isEmpty());
-
-                if(request.getParameter("nombre") != null && !request.getParameter("nombre").isEmpty()){
-                    listaRuta.removeIf(ruta -> !ws.rutaContieneCategoria(ruta, request.getParameter("nombre")));
-                }
-
-                for (DtRuta ruta : listaRuta) {
-                    String basePath = getServletContext().getRealPath("/pictures/rutas");
-                    String contextPath = request.getContextPath();
-
-                    String urlImagen = ruta.getUrlImagen();
-                    File rutaImg = null;
-
-                    if (urlImagen != null && !urlImagen.isEmpty()) {
-                        rutaImg = new File(basePath, urlImagen);
+                for (DtPaquete p : listaPaquete) {
+                    List<DtRutaEnPaquete> rutasPaquete = p.getRutaEnPaquete();
+                    rutasPaquete.removeIf(rp -> rp.getRutaDeVuelo().getEstado() != EstadoRuta.APROBADA);
+                    if (nombreFiltro != null && !nombreFiltro.isEmpty()) {
+                        rutasPaquete.removeIf(rp -> !ws.rutaContieneCategoria(rp.getRutaDeVuelo(), nombreFiltro));
                     }
+                }
 
-                    if (urlImagen == null || urlImagen.isEmpty() || !rutaImg.exists()) {
-                        ruta.setUrlImagen(contextPath + "/assets/rutaDefault.png");
+                listaPaquete.removeIf(p -> p.getRutaEnPaquete() == null || p.getRutaEnPaquete().isEmpty());
+
+                if (nombreFiltro != null && !nombreFiltro.isEmpty()) {
+                    listaRuta.removeIf(r -> !ws.rutaContieneCategoria(r, nombreFiltro));
+                }
+
+                // Setear imágenes
+                for (DtRuta r : listaRuta) {
+                    String urlImagen = r.getUrlImagen();
+                    File rutaImg = (urlImagen != null && !urlImagen.isEmpty())
+                            ? new File(basePathRutas, urlImagen)
+                            : null;
+
+                    if (urlImagen == null || urlImagen.isEmpty() || rutaImg == null || !rutaImg.exists()) {
+                        r.setUrlImagen(contextPath + "/assets/rutaDefault.png");
                     } else {
-                        ruta.setUrlImagen(contextPath + "/pictures/rutas/" + urlImagen);
+                        r.setUrlImagen(contextPath + "/pictures/rutas/" + urlImagen);
                     }
                 }
 
-                List<ListaResultados> resultados = new ArrayList<>();
-
-               resultados = Stream.concat(
+                resultados = Stream.concat(
                                 listaRuta.stream().map(r -> new ListaResultados(
                                         r.getNombre(),
                                         "Ruta",
@@ -122,26 +134,24 @@ public class HomeServlet extends HttpServlet {
                                         p
                                 ))
                         )
-                        .sorted(Comparator.comparing(o -> o.nombre.toLowerCase())) // orden alfabético
+                        .sorted(Comparator.comparing(o -> o.nombre.toLowerCase()))
                         .collect(Collectors.toList());
 
-                String orden = request.getParameter("orden");
-
-
-                Comparator<ListaResultados> comparator = Comparator.comparing(o -> o.nombre.toLowerCase());
-
-
-                if ("desc".equals(orden)) {
-                    comparator = comparator.reversed();
-                }
-
-                resultados.sort(comparator);
-                request.setAttribute("resultados", resultados);
                 request.setAttribute("esHome", true);
             }
 
-            // Forward to JSP page
+            Comparator<ListaResultados> comparator = Comparator.comparing(o -> o.nombre.toLowerCase());
+
+            if ("desc".equals(orden)) {
+                comparator = comparator.reversed();
+            }
+
+            resultados.sort(comparator);
+
+            request.setAttribute("resultados", resultados);
+
             request.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(request, response);
+
 
         } catch (Exception e) {
             System.out.println(e.getMessage());

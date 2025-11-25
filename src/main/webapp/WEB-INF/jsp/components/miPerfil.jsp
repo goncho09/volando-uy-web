@@ -57,7 +57,7 @@
             <c:if test="${not empty applicationScope.categorias}">
                 <c:forEach var="categoria" items="${applicationScope.categorias}">
                     <li class="group">
-                        <a href="${pageContext.request.contextPath}/home?nombre=${categoria}"
+                        <a href="${pageContext.request.contextPath}/home?nombre=${categoria.nombre}"
                            class="flex items-center py-2 px-3 mx-2 rounded-lg text-[#12445d] hover:bg-[#e8f7ff] transition-all duration-200 hover:translate-x-1 border border-transparent hover:border-[#2bc8c8]/20">
                             <i class="fas fa-chevron-right mr-2 text-[#1d6e86] text-xs group-hover:text-[#2bc8c8]"></i>
                                 ${categoria.nombre}
