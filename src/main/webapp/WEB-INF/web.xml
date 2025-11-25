@@ -33,4 +33,8 @@
             <secure>false</secure>
         </cookie-config>
     </session-config>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/pictures/*</url-pattern>
+    </servlet-mapping>
 </web-app>

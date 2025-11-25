@@ -9,10 +9,15 @@ import javax.servlet.http.HttpSession;
 
 import uy.volando.soap.ControladorWS;
 import uy.volando.soap.client.*;
+import uy.volando.utils.ListaResultados;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @WebServlet(name = "HomeServlet", urlPatterns = {"/home"})
 public class HomeServlet extends HttpServlet {
@@ -103,8 +108,36 @@ public class HomeServlet extends HttpServlet {
                     }
                 }
 
-                request.setAttribute("rutas", listaRuta);
-                request.setAttribute("paquetes", listaPaquete);
+                List<ListaResultados> resultados = new ArrayList<>();
+
+               resultados = Stream.concat(
+                                listaRuta.stream().map(r -> new ListaResultados(
+                                        r.getNombre(),
+                                        "Ruta",
+                                        r
+                                )),
+                                listaPaquete.stream().map(p -> new ListaResultados(
+                                        p.getNombre(),
+                                        "Paquete",
+                                        p
+                                ))
+                        )
+                        .sorted(Comparator.comparing(o -> o.nombre.toLowerCase())) // orden alfabético
+                        .collect(Collectors.toList());
+
+                String orden = request.getParameter("orden");
+
+
+                Comparator<ListaResultados> comparator = Comparator.comparing(o -> o.nombre.toLowerCase());
+
+
+                if ("desc".equals(orden)) {
+                    comparator = comparator.reversed();
+                }
+
+                resultados.sort(comparator);
+                request.setAttribute("resultados", resultados);
+                request.setAttribute("esHome", true);
             }
 
             // Forward to JSP page
