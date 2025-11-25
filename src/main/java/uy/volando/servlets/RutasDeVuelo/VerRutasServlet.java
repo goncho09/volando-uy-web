@@ -1,10 +1,8 @@
 package uy.volando.servlets.RutasDeVuelo;
 
-
-
-
 import uy.volando.soap.ControladorWS;
 import uy.volando.soap.client.DtAerolinea;
+import uy.volando.soap.client.DtRuta;
 import uy.volando.soap.client.VolandoServicePort;
 
 import javax.servlet.ServletException;
@@ -49,6 +47,49 @@ public class VerRutasServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Error al obtener la lista de rutas de vuelo: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null ||
+                session.getAttribute("usuarioTipo") == null ||
+                session.getAttribute("usuarioNickname") == null ||
+                !session.getAttribute("usuarioTipo").equals("aerolinea")) {
+
+            response.sendRedirect(request.getContextPath() + "/401.jsp");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        String nombreRuta = request.getParameter("nombre");
+
+        if ("finalizar".equals(action)) {
+
+            if (nombreRuta == null || nombreRuta.isEmpty()) {
+                response.sendRedirect(request.getContextPath()
+                        + "/ruta-de-vuelo/ver?error=Nombre inválido");
+                return;
+            }
+
+            try {
+                DtRuta dto = ws.getRutaDeVuelo(nombreRuta);
+
+                ws.finalizarRuta(dto);
+
+                response.sendRedirect(request.getContextPath()
+                        + "/ruta-de-vuelo/ver?success=Ruta finalizada correctamente");
+                return;
+
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath()
+                        + "/ruta-de-vuelo/ver?error=" + e.getMessage());
+                return;
+            }
         }
     }
 }

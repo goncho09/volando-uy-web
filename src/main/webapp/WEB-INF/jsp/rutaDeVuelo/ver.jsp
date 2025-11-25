@@ -55,17 +55,23 @@
                         <td class="px-4 py-2 text-center">$${ruta.equipajeExtra}</td>
                         <td class="px-4 py-2 text-center">${ruta.estado}</td>
 
-                        <td class="text-center px-4 py-2  space-x-3">
-                            <a href="#" class="hover:scale-110 transition-transform">
-                                <i class="fa fa-edit text-xl text-green-600"></i>
-                            </a>
-                            <form class="inline">
-                                <input type="hidden" name="id" value="${ruta.nombre}">
-                                <button type="submit" class="hover:scale-110 transition-transform">
-                                    <i class="fa fa-trash text-xl text-red-600"></i>
-                                </button>
-                            </form>
-                        </td>
+                       <td class="text-center px-4 py-2 space-x-3">
+                           <a href="#" class="hover:scale-110 transition-transform">
+                               <i class="fa fa-edit text-xl text-green-600"></i>
+                           </a>
+                           <c:if test="${ruta.estado eq 'APROBADA'}">
+                               <form method="post"
+                                     action="${pageContext.request.contextPath}/ruta-de-vuelo/ver"
+                                     class="inline">
+                                   <input type="hidden" name="action" value="finalizar">
+                                   <input type="hidden" name="nombre" value="${ruta.nombre}">
+                                   <button type="submit" class="hover:scale-110 transition-transform" title="Finalizar ruta">
+                                       <i class="fa fa-trash text-xl text-red-600"></i>
+                                   </button>
+                               </form>
+
+                           </c:if>
+                       </td>
                     </tr>
                 </c:forEach>
                 </tbody>
