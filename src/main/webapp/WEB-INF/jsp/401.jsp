@@ -14,7 +14,7 @@
             <h1 class="text-6xl font-bold text-red-600 mb-4">401</h1>
             <h2 class="text-2xl font-semibold mb-4">Acceso no autorizado</h2>
             <p class="text-gray-700 mb-6">
-                ${error ? error : 'No tienes permiso para acceder a esta página.'}
+                ${error ? error : 'No tienes permiso para acceder a esta página.'} </p>
             <a href="${pageContext.request.contextPath}/home" class="inline-block bg-[var(--azul-oscuro)] !text-white px-6 py-3 rounded-lg hover:bg-[var(--azul-claro)] transition-colors">
                 Volver al inicio
             </a>

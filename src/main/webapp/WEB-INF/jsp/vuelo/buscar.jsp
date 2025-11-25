@@ -1,11 +1,11 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Volando.uy | Buscar vuelo</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volando.uy | Buscar vuelo</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
@@ -14,7 +14,7 @@
 
 <jsp:include page="../components/header.jsp"/>
 
-<main id="main-content" class="flex flex-col items-center md:items-start md:flex-row max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8 justify-center  mt-5 hidden">
+<main class="flex flex-col items-center md:items-start md:flex-row max-w-7xl md:mx-auto px-4 sm:px-6 lg:px-8 justify-center  mt-5">
 
     <!-- Sidebar -->
     <jsp:include page="../components/miPerfil.jsp"/>
@@ -96,9 +96,7 @@
 </body>
 
 <script defer>
-        const mainContent = document.getElementById('main-content');
         const vuelosSelect = document.getElementById('vuelos');
-        mainContent.classList.remove('hidden');
 
         const form = document.getElementById('formBuscarVuelo');
         const aerolineaSelect = document.getElementById('aerolinea');
@@ -108,6 +106,7 @@
             if (aerolinea) {
                 window.location.href = '${pageContext.request.contextPath}/vuelo/buscar?aerolinea=' + aerolinea;
             }
+        });
 
         form.addEventListener('submit', function(event) {
             const ruta = document.getElementById('ruta').value;
@@ -132,6 +131,5 @@
                 verInfoBtn.classList.add('hidden');
             }
         });
-    });
 </script>
 </html>

@@ -2,10 +2,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <head>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
 </head>
 
 <header id="header" class="flex flex-col px-4 py-2 text-white w-[100vw] bg-[var(--azul-oscuro)]">
@@ -366,3 +366,12 @@
 </script>
 
 
+<style>
+    :root {
+        --azul-oscuro: #0c2636;
+        --azul-medio: #12445d;
+        --azul-claro: #1d6e86;
+        --celeste: #269fb8;
+        --celeste-claro: #2bc8c8;
+    }
+</style>
