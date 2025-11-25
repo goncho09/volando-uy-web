@@ -71,6 +71,7 @@
                         </div>
 
                        <!-- Video de la ruta (si existe) -->
+                       <!-- Video de la ruta (si existe) -->
                        <c:if test="${not empty ruta.urlVideo}">
                            <div class="border-t border-gray-200 pt-4 mb-4">
                                <h6 class="font-bold text-[#0c2636] mb-3 flex items-center">
@@ -78,9 +79,17 @@
                                    Video de la Ruta
                                </h6>
                                <div class="relative pb-[56.25%] h-0 overflow-hidden rounded-lg shadow-md">
+                                   <%
+                                       String urlVideo = ((uy.volando.soap.client.DtRuta)request.getAttribute("ruta")).getUrlVideo();
+                                       if (urlVideo != null && urlVideo.contains("youtube.com/watch?v=")) {
+                                           urlVideo = urlVideo.replace("watch?v=", "embed/");
+                                       } else if (urlVideo != null && urlVideo.contains("youtu.be/")) {
+                                           urlVideo = urlVideo.replace("youtu.be/", "youtube.com/embed/");
+                                       }
+                                   %>
                                    <iframe
                                        class="absolute top-0 left-0 w-full h-full"
-                                       src="${ruta.urlVideo}"
+                                       src="<%= urlVideo %>"
                                        frameborder="0"
                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                        allowfullscreen>
