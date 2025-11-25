@@ -51,8 +51,8 @@
                         <td class="px-4 py-2 text-center">${ruta.nombre}</td>
                         <td class="px-4 py-2 text-center">${ruta.descripcionCorta}</td>
                         <td class="px-4 py-2 text-center">${ruta.duracion}</td>
-                        <td class="px-4 py-2 text-center">${ruta.ciudadOrigen}</td>
-                        <td class="px-4 py-2 text-center">${ruta.ciudadDestino}</td>
+                        <td class="px-4 py-2 text-center">${ruta.ciudadOrigen.nombre}, ${ruta.ciudadOrigen.pais}</td>
+                        <td class="px-4 py-2 text-center">${ruta.ciudadDestino.nombre}, ${ruta.ciudadDestino.pais}</td>
                         <td class="px-4 py-2 text-center">$${ruta.costoEjecutivo}</td>
                         <td class="px-4 py-2 text-center">$${ruta.costoTurista}</td>
                         <td class="px-4 py-2 text-center">$${ruta.equipajeExtra}</td>

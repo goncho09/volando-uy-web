@@ -39,7 +39,8 @@ public class VerRutasServlet extends HttpServlet {
 
         try{
 
-            DtAerolinea aerolineaIniciada = (DtAerolinea) ws.getAerolinea(session.getAttribute("usuarioNickname").toString());
+            String nicknameAerolinea = session.getAttribute("usuarioNickname").toString();
+            DtAerolinea aerolineaIniciada = ws.getAerolinea(nicknameAerolinea);
             request.setAttribute("rutas", aerolineaIniciada.getRutasDeVuelo());
 
             request.getRequestDispatcher("/WEB-INF/jsp/rutaDeVuelo/ver.jsp").forward(request, response);

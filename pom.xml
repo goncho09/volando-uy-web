@@ -115,6 +115,10 @@
                     <packageName>uy.volando.soap.client</packageName>
                     <keep>true</keep>
                     <sourceDestDir>${project.build.directory}/generated-sources/wsimport</sourceDestDir>
+                    <args>
+                        <arg>-encoding</arg>
+                        <arg>UTF-8</arg>
+                    </args>
                 </configuration>
             </plugin>
         </plugins>
