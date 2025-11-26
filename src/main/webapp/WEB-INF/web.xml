@@ -7,11 +7,6 @@
 
     <display-name>Volando UY Backend</display-name>
 
-    <context-param>
-        <param-name>ws.url</param-name>
-        <param-value>http://localhost:8081/volando/soap?wsdl</param-value>
-    </context-param>
-
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
