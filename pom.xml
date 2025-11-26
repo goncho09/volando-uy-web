@@ -6,7 +6,7 @@
 
     <groupId>uy.volando</groupId>
     <artifactId>volando-uy-web</artifactId>
-    <version>1.0.0</version>
+    <version>3.0.0</version>
     <packaging>war</packaging>
 
     <name>Volando Web</name>
@@ -15,6 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <file.encoding>UTF-8</file.encoding>
+        <wsdl.url>http://${soap.ip}:${soap.port}${soap.path}?wsdl</wsdl.url>
     </properties>
 
     <dependencies>
@@ -75,7 +76,7 @@
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
-        <finalName>volando-uy-backend</finalName>
+        <finalName>volando-uy-web</finalName>
 
         <plugins>
             <!-- Compilador -->
@@ -96,6 +97,26 @@
                 <version>3.4.0</version>
             </plugin>
 
+            <!-- Plugin para leer app.config -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${user.home}/volandouyFiles/app.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- JAX-WS wsimport -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -110,7 +131,7 @@
                 </executions>
                 <configuration>
                     <wsdlUrls>
-                        <wsdlUrl>http://localhost:8081/volando/soap?wsdl</wsdlUrl>
+                        <wsdlUrl>${wsdl.url}</wsdlUrl>
                     </wsdlUrls>
                     <packageName>uy.volando.soap.client</packageName>
                     <keep>true</keep>
@@ -121,6 +142,7 @@
                     </args>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>
