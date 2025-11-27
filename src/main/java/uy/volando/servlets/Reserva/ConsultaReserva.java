@@ -50,7 +50,7 @@ public class ConsultaReserva extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("usuarioNickname") == null) {
+        if (session.getAttribute("usuarioNickname") == null || session.getAttribute("usuarioTipo") == null) {
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
             return;
         }
@@ -79,7 +79,6 @@ public class ConsultaReserva extends HttpServlet {
 
             request.setAttribute("reserva", reserva);
             request.getRequestDispatcher("/WEB-INF/jsp/reservas/consulta.jsp").forward(request, response);
-
         } catch (Exception e) {
             request.setAttribute("error", "No se pudo cargar la reserva: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);

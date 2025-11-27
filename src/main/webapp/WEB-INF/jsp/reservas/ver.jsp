@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volando.uy | Ver reservas</title>
 
-    <!-- Librerias Header -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
 
@@ -76,7 +75,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <!-- Aún no tiene check-in → solo el ojo para entrar y hacerlo -->
-                                        <a href="${pageContext.request.contextPath}/reservas/detalle?vuelo=${reserva.vuelo.nombre}&fecha=${reserva.fecha}"
+                                        <a href="${pageContext.request.contextPath}/reservas/consulta?vuelo=${reserva.vuelo.nombre}&fecha=${reserva.fecha}"
                                            class="hover:scale-110 transition-transform inline-block"
                                            title="Realizar check-in">
                                             <i class="fa-solid fa-eye" style="color: #74C0FC;" class="text-2xl"></i>
