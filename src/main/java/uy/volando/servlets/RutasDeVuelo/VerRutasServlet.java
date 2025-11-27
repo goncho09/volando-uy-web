@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @WebServlet (name = "VerRutasServlet", urlPatterns = {"/ruta-de-vuelo/ver"})
 public class VerRutasServlet extends HttpServlet {
@@ -39,7 +42,16 @@ public class VerRutasServlet extends HttpServlet {
 
             String nicknameAerolinea = session.getAttribute("usuarioNickname").toString();
             DtAerolinea aerolineaIniciada = ws.getAerolinea(nicknameAerolinea);
-            request.setAttribute("rutas", aerolineaIniciada.getRutasDeVuelo());
+            List<DtRuta> rutas = aerolineaIniciada.getRutasDeVuelo();
+            Map<String, Boolean> puedeFinalizarMap = new HashMap<>();
+
+            for (DtRuta ruta : rutas) {
+                boolean puede = ws.puedeFinalizar(ruta.getNombre());
+                puedeFinalizarMap.put(ruta.getNombre(), puede);
+            }
+
+            request.setAttribute("rutas", rutas);
+            request.setAttribute("puedeFinalizarMap", puedeFinalizarMap);
 
             request.getRequestDispatcher("/WEB-INF/jsp/rutaDeVuelo/ver.jsp").forward(request, response);
         } catch (Exception e) {
@@ -83,12 +95,9 @@ public class VerRutasServlet extends HttpServlet {
 
                 response.sendRedirect(request.getContextPath()
                         + "/ruta-de-vuelo/ver?success=Ruta finalizada correctamente");
-                return;
-
             } catch (Exception e) {
                 response.sendRedirect(request.getContextPath()
                         + "/ruta-de-vuelo/ver?error=" + e.getMessage());
-                return;
             }
         }
     }

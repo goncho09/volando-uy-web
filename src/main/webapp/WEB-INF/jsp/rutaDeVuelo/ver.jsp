@@ -65,9 +65,11 @@
                                      class="inline">
                                    <input type="hidden" name="action" value="finalizar">
                                    <input type="hidden" name="nombre" value="${ruta.nombre}">
-                                   <button type="submit" class="hover:scale-110 transition-transform" title="Finalizar ruta">
-                                       <i class="fa fa-trash text-xl text-red-600"></i>
-                                   </button>
+                                   <c:if test="${puedeFinalizarMap[ruta.nombre]}">
+                                       <button type="submit" class="hover:scale-110 transition-transform" title="Finalizar ruta">
+                                           <i class="fa fa-trash text-xl text-red-600"></i>
+                                       </button>
+                                   </c:if>
                                </form>
 
                            </c:if>
