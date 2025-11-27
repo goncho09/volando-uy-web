@@ -83,5 +83,15 @@
     </section>
 </main>
 
+<style>
+    :root {
+        --azul-oscuro: #0c2636;
+        --azul-medio: #12445d;
+        --azul-claro: #1d6e86;
+        --celeste: #269fb8;
+        --celeste-claro: #2bc8c8;
+    }
+</style>
+
 </body>
 </html>

@@ -54,11 +54,8 @@ summary::-webkit-details-marker {
     cursor: pointer;
 }
 
-:not(.daisy) input,
-:not(.daisy) textarea,
-:not(.daisy) select,
-:not(.daisy) button {
-    /*border: none;*/
+input, textarea,select, button {
+    border: none;
     outline: none;
     cursor: pointer;
 }

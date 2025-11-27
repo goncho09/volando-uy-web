@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 </head>
 
 <header id="header" class="flex flex-col px-4 py-2 text-white w-[100vw] bg-[var(--azul-oscuro)]">
@@ -32,8 +31,7 @@
             <c:otherwise>
                 <div class="flex space-x-2">
                     <a href="${pageContext.request.contextPath}/signin">
-                        <p class="decoration-[var(--celeste-claro)] underline-offset-5 m-0 hover:underline">Iniciar
-                            sesión</p>
+                        <p class="decoration-[var(--celeste-claro)] underline-offset-5 m-0 hover:underline">Iniciar sesión</p>
                     </a>
                     <div class="border-l border-1 h-6"></div>
                     <a href="${pageContext.request.contextPath}/signup">
@@ -54,284 +52,144 @@
     </form>
 
     <!-- Navbar -->
-    <nav class="navbar shadow-sm flex items-center justify-center daisy">
+    <nav class="shadow-sm flex items-center justify-center">
         <!-- Navbar Start (Hamburguesa solo en móvil) -->
-        <div class="navbar-start !w-full flex md:!hidden">
-            <div class="dropdown">
-                <div tabindex="0" role="button" class="flex">
-                    <i class="fa-solid fa-bars text-xl text-center"></i>
+        <div class="relative flex p-4 md:hidden w-full">
+            <button id="btn-mobile-menu" class="flex">
+                <i class="fa-solid fa-bars text-xl text-center"></i>
+            </button>
+
+            <div id="mobile-menu"
+                 class="hidden absolute top-full left-0 w-72 z-[100] bg-[var(--azul-oscuro)] text-white p-3 rounded shadow animate-fade">
+
+                <!-- Vuelos -->
+                <div class="menu-section">
+                    <button class="menu-title flex items-center justify-between w-full">
+                        Vuelos
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <ul class="submenu hidden pl-4 transition-all duration-200">
+                        <li><a class="block py-2" href="${pageContext.request.contextPath}/vuelo/buscar">Buscar vuelo</a></li>
+                    </ul>
                 </div>
-                <ul tabindex="0"
-                    class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow rounded-box !w-72 bg-[var(--azul-oscuro)] text-white">
 
-                    <!-- Vuelos -->
-                    <li>
-                        <details>
-                            <summary>Vuelos</summary>
-                            <ul class="p-2 bg-[var(--azul-oscuro)]">
-                                <c:if test="${usuarioTipo!= null && usuarioTipo == 'aerolinea'}">
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/vuelo/crear">
-                                            <p
-                                                    class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Crear vuelo</p>
-                                        </a>
-                                    </li>
-                                </c:if>
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/vuelo/buscar">
-                                        <p
-                                                class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Buscar vuelo</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </details>
-                    </li>
+                <!-- Rutas (solo aerolínea) -->
+                <c:if test="${usuarioTipo!= null && usuarioTipo == 'aerolinea'}">
+                <div class="menu-section">
+                    <button class="menu-title flex items-center justify-between w-full">
+                        Rutas de vuelo
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <ul class="submenu hidden pl-4 transition-all duration-200">
+                        <li><a class="block py-2" href="${pageContext.request.contextPath}/ruta-de-vuelo/ver">Ver rutas</a></li>
+                    </ul>
+                </div>
+                </c:if>
 
-                    <!-- Paquetes -->
-                    <li>
-                        <details>
-                            <summary>Paquetes</summary>
-                            <ul class="p-2 bg-[var(--azul-oscuro)]">
-                                <c:if test="${usuarioTipo!= null}">
-                                    <c:if test="${usuarioTipo == 'aerolinea'}">
-                                        <li>
-                                            <a href="${pageContext.request.contextPath}/paquete/crear">
-                                                <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                    Crear paquete</p>
-                                            </a>
-                                        </li>
-                                    </c:if>
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/paquete/ver">
-                                            <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Ver mis paquetes</p>
-                                        </a>
-                                    </li>
-                                </c:if>
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/paquete/buscar">
-                                        <p
-                                                class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Consultar paquete</p>
-                                    </a>
-                                </li>
-                                <c:if test="${usuarioTipo!= null && usuarioTipo == 'cliente'}">
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/paquete/comprar">
-                                            <p
-                                                    class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Comprar paquete</p>
-                                        </a>
-                                    </li>
-                                </c:if>
-                            </ul>
-                        </details>
-                    </li>
+                <!-- Reservas -->
+                <c:if test="${usuarioTipo!= null}">
+                    <div class="menu-section">
+                        <button class="menu-title flex items-center justify-between w-full">
+                            Reservas
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </button>
+                        <ul class="submenu hidden pl-4 transition-all duration-200">
+                            <li><a class="block py-2" href="${pageContext.request.contextPath}/reservas/ver">Ver mis reservas</a></li>
+                        </ul>
+                    </div>
+                </c:if>
 
-                    <!-- Rutas de vuelo -->
-                    <c:if test="${usuarioTipo!= null && usuarioTipo == 'aerolinea'}">
-                        <li>
-                            <details>
-                                <summary>Rutas de vuelo</summary>
-                                <ul class="p-2 bg-[var(--azul-oscuro)]">
-
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/ruta-de-vuelo/crear">
-                                            <p
-                                                    class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Crear ruta</p>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/ruta-de-vuelo/ver">
-                                            <p
-                                                    class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Ver rutas</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </details>
-                        </li>
-                    </c:if>
-
-                    <!-- Reservas -->
-                    <c:if test="${usuarioTipo!= null}">
-                        <li>
-                            <details>
-                                <summary>Reservas</summary>
-                                <ul class="p-2 bg-[var(--azul-oscuro)]">
-                                    <c:if test="${usuarioTipo!= null && usuarioTipo == 'cliente'}">
-                                        <li>
-                                            <a href="${pageContext.request.contextPath}/reservas/crear">
-                                                <p
-                                                        class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                    Crear reserva</p>
-                                            </a>
-                                        </li>
-                                    </c:if>
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/reservas/ver">
-                                            <p
-                                                    class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Ver mis reservas</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </details>
-                        </li>
-                    </c:if>
-                    <li>
-                        <details>
-                            <summary>Usuarios</summary>
-                            <ul class="p-2 bg-[var(--azul-oscuro)]">
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/perfil/buscar">
-                                            <p
-                                                    class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Buscar usuario</p>
-                                        </a>
-                                    </li>
-                            </ul>
-                        </details>
-                    </li>
-                </ul>
             </div>
         </div>
 
         <!-- Navbar Center (solo escritorio) -->
-        <div class="flex w-full items-center  z-10 justify-center hidden md:flex" id="navbar-center">
+        <div class="hidden md:flex w-full items-center z-10 justify-center p-4" id="navbar-center">
             <ul class="menu menu-horizontal flex m-0 text-white">
 
                 <!-- Vuelos -->
-                <li>
-                    <details>
-                        <summary>Vuelos</summary>
-                        <ul class="p-2 w-32 bg-[var(--azul-oscuro)]">
-                            <c:if test="${usuarioTipo != null && usuarioTipo == 'aerolinea'}">
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/vuelo/crear">
-                                        <p
-                                                class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Crear vuelo</p>
-                                    </a>
-                                </li>
-                            </c:if>
-                            <li>
-                                <a href="${pageContext.request.contextPath}/vuelo/buscar">
-                                    <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                        Buscar vuelo</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </details>
+                <li class="relative px-2 desktop-section">
+                    <button class="desktop-title flex items-center gap-1">
+                        Vuelos
+                        <i class="fa-solid fa-chevron-down text-xs arrow"></i>
+                    </button>
+
+                    <ul class="desktop-submenu absolute hidden flex-col bg-[var(--azul-oscuro)] p-2 w-40 rounded shadow">
+                        <c:if test="${usuarioTipo != null && usuarioTipo== 'aerolinea'}">
+                            <li><a class="block p-3" href="${pageContext.request.contextPath}/vuelo/crear">Crear vuelo</a></li>
+                        </c:if>
+                        <li><a class="block p-3" href="${pageContext.request.contextPath}/vuelo/buscar">Buscar vuelo</a></li>
+                    </ul>
                 </li>
 
                 <!-- Paquetes -->
-                <li>
-                    <details>
-                        <summary>Paquetes</summary>
-                        <ul class="p-2 w-32 bg-[var(--azul-oscuro)]">
-                            <c:if test="${usuarioTipo!= null}">
-                                <c:if test="${usuarioTipo == 'aerolinea'}">
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/paquete/crear">
-                                        <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Crear paquete</p>
-                                    </a>
-                                </li>
-                                </c:if>
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/paquete/ver">
-                                        <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Ver mis paquetes</p>
-                                    </a>
-                                </li>
+                <li class="relative px-2 desktop-section">
+                    <button class="desktop-title flex items-center gap-1">
+                        Paquetes
+                        <i class="fa-solid fa-chevron-down text-xs arrow"></i>
+                    </button>
+
+                    <ul class="desktop-submenu absolute hidden flex-col bg-[var(--azul-oscuro)] p-2 w-52 rounded shadow">
+
+                        <c:if test="${usuarioTipo!= null}">
+                            <c:if test="${usuarioTipo=='aerolinea'}">
+                                <li><a class="block p-3" href="${pageContext.request.contextPath}/paquete/crear">Crear paquete</a></li>
                             </c:if>
-                            <li>
-                                <a href="${pageContext.request.contextPath}/paquete/buscar">
-                                    <p
-                                            class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                        Consultar paquetes</p>
-                                </a>
-                            </li>
-                            <c:if test="${usuarioTipo!= null && usuarioTipo == 'cliente'}">
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/paquete/comprar">
-                                        <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Comprar paquete</p>
-                                    </a>
-                                </li>
-                            </c:if>
-                        </ul>
-                    </details>
+                            <li><a class="block p-3" href="${pageContext.request.contextPath}/paquete/ver">Ver mis paquetes</a></li>
+                        </c:if>
+
+                        <li><a class="block p-3" href="${pageContext.request.contextPath}/paquete/buscar">Consultar paquetes</a></li>
+
+                        <c:if test="${usuarioTipo!=null && usuarioTipo=='cliente'}">
+                            <li><a class="block p-3" href="${pageContext.request.contextPath}/paquete/comprar">Comprar paquete</a></li>
+                        </c:if>
+                    </ul>
                 </li>
 
-                <!-- Rutas de vuelo -->
-                <c:if test="${usuarioTipo!= null && usuarioTipo == 'aerolinea'}">
-                    <li>
-                        <details>
-                            <summary>Rutas de vuelo</summary>
-                            <ul class="p-2 w-32 bg-[var(--azul-oscuro)]">
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/ruta-de-vuelo/crear">
-                                        <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Crear ruta</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/ruta-de-vuelo/ver">
-                                        <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Ver rutas</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </details>
+                <!-- Rutas (solo aerolínea) -->
+                <c:if test="${usuarioTipo!= null && usuarioTipo=='aerolinea'}">
+                    <li class="relative px-2 desktop-section">
+                        <button class="desktop-title flex items-center gap-1">
+                            Rutas de vuelo
+                            <i class="fa-solid fa-chevron-down text-xs arrow"></i>
+                        </button>
+
+                        <ul class="desktop-submenu absolute hidden flex-col bg-[var(--azul-oscuro)] p-2 w-44 rounded shadow">
+                            <li><a class="block p-3" href="${pageContext.request.contextPath}/ruta-de-vuelo/crear">Crear ruta</a></li>
+                            <li><a class="block p-3" href="${pageContext.request.contextPath}/ruta-de-vuelo/ver">Ver rutas</a></li>
+                        </ul>
                     </li>
                 </c:if>
 
                 <!-- Reservas -->
-                <c:if test="${usuarioTipo!= null }">
-                    <li>
-                        <details>
-                            <summary>Reservas</summary>
-                            <ul class="p-2 w-32 bg-[var(--azul-oscuro)]">
-                                <c:if test="${usuarioTipo!= null && usuarioTipo == 'cliente'}">
-                                    <li>
-                                        <a href="${pageContext.request.contextPath}/reservas/crear">
-                                            <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                                Crear reserva</p>
-                                        </a>
-                                    </li>
-                                </c:if>
-                                <li>
-                                    <a href="${pageContext.request.contextPath}/reservas/ver">
-                                        <p class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                            Ver mis reservas</p>
-                                    </a>
-                                </li>
+                <c:if test="${usuarioTipo!= null}">
+                    <li class="relative px-2 desktop-section">
+                        <button class="desktop-title flex items-center gap-1">
+                            Reservas
+                            <i class="fa-solid fa-chevron-down text-xs arrow"></i>
+                        </button>
 
-                            </ul>
-                        </details>
+                        <ul class="desktop-submenu absolute hidden flex-col bg-[var(--azul-oscuro)] p-2 w-44 rounded shadow">
+
+                            <c:if test="${usuarioTipo=='cliente'}">
+                                <li><a class="block p-3" href="${pageContext.request.contextPath}/reservas/crear">Crear reserva</a></li>
+                            </c:if>
+                            <li><a class="block p-3" href="${pageContext.request.contextPath}/reservas/ver">Ver mis reservas</a></li>
+                        </ul>
                     </li>
                 </c:if>
 
-                <li>
-                    <details>
-                        <summary>Usuarios</summary>
-                        <ul class="p-2 bg-[var(--azul-oscuro)]">
-                            <li>
-                                <a href="${pageContext.request.contextPath}/perfil/buscar">
-                                    <p
-                                            class="m-0 decoration-[var(--celeste-claro)] underline-offset-5 hover:underline">
-                                        Buscar usuario</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </details>
+                <!-- Usuarios -->
+                <li class="relative px-2 desktop-section">
+                    <button class="desktop-title flex items-center gap-1">
+                        Usuarios
+                        <i class="fa-solid fa-chevron-down text-xs arrow"></i>
+                    </button>
+
+                    <ul class="desktop-submenu absolute hidden flex-col bg-[var(--azul-oscuro)] p-2 w-40 rounded shadow">
+                        <li><a class="block p-3" href="${pageContext.request.contextPath}/perfil/buscar">Buscar usuario</a></li>
+                    </ul>
                 </li>
+
             </ul>
         </div>
     </nav>
@@ -339,22 +197,51 @@
 </header>
 
 <script defer>
-    const formHeader = document.getElementById('formBuscar');
 
-    function setupDropdowns() {
-        const allDetails = document.querySelectorAll('nav details');
-        allDetails.forEach((detail) => {
-            detail.addEventListener('toggle', () => {
-                if (detail.open) {
-                    allDetails.forEach((other) => {
-                        if (other !== detail) other.open = false;
-                    });
-                }
+    /* DESKTOP DROPDOWNS */
+    document.querySelectorAll(".desktop-section").forEach(section => {
+
+        const title = section.querySelector(".desktop-title");
+        const submenu = section.querySelector(".desktop-submenu");
+        const arrow = section.querySelector(".arrow");
+
+        title.addEventListener("click", () => {
+            const open = submenu.classList.contains("open");
+
+            document.querySelectorAll(".desktop-submenu").forEach(s => {
+                s.classList.add("hidden");
+                s.classList.remove("open");
             });
-        });
-    }
+            document.querySelectorAll(".desktop-section .arrow").forEach(a => {
+                a.style.transform = "rotate(0deg)";
+            });
 
-    setupDropdowns();
+            if (!open) {
+                submenu.classList.remove("hidden");
+                submenu.classList.add("open");
+                arrow.style.transform = "rotate(180deg)";
+            }
+        });
+    });
+
+    /* MOBILE MENU GENERAL */
+    const btnMobileMenu = document.getElementById("btn-mobile-menu");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    btnMobileMenu.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+    });
+
+    /* MOBILE SUBMENUS */
+    document.querySelectorAll(".menu-title").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const submenu = btn.nextElementSibling;
+
+            submenu.classList.toggle("hidden");
+        });
+    });
+
+    const formHeader = document.getElementById('formBuscar');
 
     formHeader.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -363,15 +250,27 @@
             window.location.href = '${pageContext.request.contextPath}/home?busqueda=' + palabraBuscar.value;
         }
     });
+
 </script>
 
-
 <style>
-    :root {
-        --azul-oscuro: #0c2636;
-        --azul-medio: #12445d;
-        --azul-claro: #1d6e86;
-        --celeste: #269fb8;
-        --celeste-claro: #2bc8c8;
+    .desktop-submenu {
+        opacity: 0;
+        transform: translateY(-6px);
+        transition: all 0.22s ease;
+    }
+
+    .desktop-submenu.open {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .animate-fade {
+        animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 </style>

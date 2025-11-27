@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volando.uy | Buscar vuelo</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body>
 
@@ -132,4 +132,14 @@
             }
         });
 </script>
+
+<style>
+    :root {
+        --azul-oscuro: #0c2636;
+        --azul-medio: #12445d;
+        --azul-claro: #1d6e86;
+        --celeste: #269fb8;
+        --celeste-claro: #2bc8c8;
+    }
+</style>
 </html>
