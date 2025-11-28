@@ -55,19 +55,15 @@ public class PerfilServlet extends HttpServlet {
         try {
             DtUsuario usuario = ws.getUsuario(nickname);
 
-            String basePath = getServletContext().getRealPath("/pictures/users");
             String contextPath = request.getContextPath();
-
             String urlImagen = usuario.getUrlImage();
-            File userImg = null;
-            if (urlImagen != null && !urlImagen.isEmpty()) {
-                userImg = new File(basePath, urlImagen);
-            }
 
-            if (urlImagen == null || urlImagen.isEmpty() || !userImg.exists()) {
-                usuario.setUrlImage(contextPath + "/assets/userDefault.png");
+            boolean invalida = (urlImagen == null || urlImagen.isEmpty());
+
+            if (invalida) {
+                usuario.setUrlImage(contextPath + "/assets/rutaDefault.png");
             } else {
-                usuario.setUrlImage(contextPath + "/pictures/users/" + urlImagen);
+                usuario.setUrlImage(contextPath + "/imagen?nombre=" + urlImagen + "&tipo=User");
             }
 
             boolean modificar = false;
@@ -214,21 +210,15 @@ public class PerfilServlet extends HttpServlet {
             // Actualiza session usuario
             DtUsuario updatedUsuario = ws.getUsuario(nickname);
 
-            String basePath = getServletContext().getRealPath("/pictures/users");
             String contextPath = request.getContextPath();
+            String urlImagenActualizado = updatedUsuario.getUrlImage();
 
-            String urlImagen = updatedUsuario.getUrlImage();
-            File userImg = null;
+            boolean invalida = (urlImagenActualizado == null || urlImagenActualizado.isEmpty());
 
-
-            if (urlImagen != null && !urlImagen.isEmpty()) {
-                userImg = new File(basePath, urlImagen);
-            }
-
-            if (urlImagen == null || urlImagen.isEmpty() || !userImg.exists()) {
-                updatedUsuario.setUrlImage(contextPath + "/assets/userDefault.png");
+            if (invalida) {
+                updatedUsuario.setUrlImage(contextPath + "/assets/rutaDefault.png");
             } else {
-                updatedUsuario.setUrlImage(contextPath + "/pictures/users/" + urlImagen);
+                updatedUsuario.setUrlImage(contextPath + "/imagen?nombre=" + urlImagenActualizado + "&tipo=User");
             }
 
             session.setAttribute("usuario", updatedUsuario);

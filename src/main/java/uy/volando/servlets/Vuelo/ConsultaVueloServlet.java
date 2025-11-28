@@ -28,20 +28,15 @@ public class ConsultaVueloServlet extends HttpServlet {
             DtVuelo vuelo = ws.getVuelo(idVuelo);
             DtRuta ruta = vuelo.getRutaDeVuelo();
 
-            String basePath = getServletContext().getRealPath("/pictures/vuelos");
             String contextPath = request.getContextPath();
 
-            String urlImage = vuelo.getUrlImage();
-            File vueloImg = null;
+            String urlImagen = vuelo.getUrlImage();
+            boolean invalida = (urlImagen == null || urlImagen.isEmpty());
 
-            if (urlImage != null && !urlImage.isEmpty()) {
-                vueloImg = new File(basePath, urlImage);
-            }
-
-            if (urlImage == null || urlImage.isEmpty() || !vueloImg.exists()) {
-                vuelo.setUrlImage(contextPath + "/assets/vueloDefault.jpg");
+            if (invalida) {
+                vuelo.setUrlImage(contextPath + "/assets/rutaDefault.png");
             } else {
-                vuelo.setUrlImage(contextPath + "/pictures/vuelos/" + urlImage);
+                vuelo.setUrlImage(contextPath + "/imagen?nombre=" + urlImagen + "&tipo=Vuelo");
             }
 
             request.setAttribute("ruta", ruta);

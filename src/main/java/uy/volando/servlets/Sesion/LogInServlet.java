@@ -61,21 +61,15 @@ public class LogInServlet extends HttpServlet {
 
                 session.setAttribute("usuarioNickname", usuario.getNickname());
 
-                String basePath = getServletContext().getRealPath("/pictures/users");
                 String contextPath = request.getContextPath();
-
                 String urlImagen = usuario.getUrlImage();
-                File userImg = null;
 
+                boolean invalida = (urlImagen == null || urlImagen.isEmpty());
 
-                if (urlImagen != null && !urlImagen.isEmpty()) {
-                    userImg = new File(basePath, urlImagen);
-                }
-
-                if (urlImagen == null || urlImagen.isEmpty() || !userImg.exists()) {
-                    usuario.setUrlImage(contextPath + "/assets/userDefault.png");
+                if (invalida) {
+                    usuario.setUrlImage(contextPath + "/assets/rutaDefault.png");
                 } else {
-                    usuario.setUrlImage(contextPath + "/pictures/users/" + urlImagen);
+                    usuario.setUrlImage(contextPath + "/imagen?nombre=" + urlImagen + "&tipo=User");
                 }
 
                 session.setAttribute("usuarioImagen", usuario.getUrlImage());

@@ -45,19 +45,15 @@ public class BuscarRutaServlet extends HttpServlet {
             }
 
             // Procesar imagen de ruta
-            String basePath = getServletContext().getRealPath("/pictures/rutas");
             String contextPath = request.getContextPath();
+
             String urlImagen = ruta.getUrlImagen();
-            File rutaImg = null;
+            boolean invalida = (urlImagen == null || urlImagen.isEmpty());
 
-            if (urlImagen != null && !urlImagen.isEmpty()) {
-                rutaImg = new File(basePath, urlImagen);
-            }
-
-            if (urlImagen == null || urlImagen.isEmpty() || !rutaImg.exists()) {
+            if (invalida) {
                 ruta.setUrlImagen(contextPath + "/assets/rutaDefault.png");
             } else {
-                ruta.setUrlImagen(contextPath + "/pictures/rutas/" + urlImagen);
+                ruta.setUrlImagen(contextPath + "/imagen?nombre=" + urlImagen + "&tipo=Ruta");
             }
 
             // Procesar vuelos
@@ -65,19 +61,13 @@ public class BuscarRutaServlet extends HttpServlet {
             vueloList.removeIf(vuelo -> LocalDate.parse(vuelo.getFecha().toString()).isBefore(LocalDate.now()));
 
             for (DtVuelo vuelo : vueloList) {
-                basePath = getServletContext().getRealPath("/pictures/vuelos");  // Reasigna basePath
+                String urlImagenVuelo = vuelo.getUrlImage();
+                boolean invalidaVuelo = (urlImagenVuelo == null || urlImagenVuelo.isEmpty());
 
-                String urlImage = vuelo.getUrlImage();
-                File vueloImg = null;
-
-                if (urlImage != null && !urlImage.isEmpty()) {
-                    vueloImg = new File(basePath, urlImage);
-                }
-
-                if (urlImage == null || urlImage.isEmpty() || !vueloImg.exists()) {
-                    vuelo.setUrlImage(contextPath + "/assets/vueloDefault.jpg");
+                if (invalidaVuelo) {
+                    vuelo.setUrlImage(contextPath + "/assets/rutaDefault.png");
                 } else {
-                    vuelo.setUrlImage(contextPath + "/pictures/vuelos/" + urlImage);
+                    vuelo.setUrlImage(contextPath + "/imagen?nombre=" + urlImagenVuelo + "&tipo=Vuelo");
                 }
             }
 
