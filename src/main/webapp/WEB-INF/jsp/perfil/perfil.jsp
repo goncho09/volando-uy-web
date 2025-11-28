@@ -131,7 +131,7 @@
                                         id="selectTipoDocumento"
                                         class="flex-grow outline-none bg-transparent text-gray-700 py-2 px-2 rounded focus:bg-gray-100"
                                 >
-                                    <option value="CÉDULA DE IDENTIDAD" ${cliente.tipoDocumento == 'CEDULA' ? 'selected' : ''}>
+                                    <option value="CEDULA" ${cliente.tipoDocumento == 'CEDULA' ? 'selected' : ''}>
                                         CÉDULA DE IDENTIDAD
                                     </option>
                                     <option value="PASAPORTE" ${cliente.tipoDocumento == 'PASAPORTE' ? 'selected' : ''}>

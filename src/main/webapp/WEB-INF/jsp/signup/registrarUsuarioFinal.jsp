@@ -9,6 +9,7 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico?v=2" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css">
 </head>

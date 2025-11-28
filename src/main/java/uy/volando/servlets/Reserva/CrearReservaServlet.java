@@ -9,6 +9,7 @@ package uy.volando.servlets.Reserva;
 
 
 
+import com.sun.xml.ws.fault.ServerSOAPFaultException;
 import uy.volando.soap.ControladorWS;
 import uy.volando.soap.client.*;
 
@@ -32,6 +33,9 @@ public class CrearReservaServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
 
         HttpSession session = request.getSession(false);
 
@@ -142,6 +146,8 @@ public class CrearReservaServlet extends HttpServlet {
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
             String userAgent = request.getHeader("User-Agent");
+            request.setCharacterEncoding("UTF-8");
+            response.setContentType("text/html; charset=UTF-8");
 
             boolean esMobile = userAgent != null && (
                     userAgent.contains("Mobile") ||
@@ -270,11 +276,17 @@ public class CrearReservaServlet extends HttpServlet {
                     reserva.setPaquetePago(paqueteSeleccionado);
                 }
 
-                try{
+                try {
                     ws.altaReserva(reserva);
-                } catch (IllegalArgumentException ex) {
-                    throw new Exception(ex.getMessage());
+                } catch (ServerSOAPFaultException ex) {
+
+                    String msg = ex.getFault().getFaultString(); // mensaje real del SOAP Fault
+
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write(msg);
+                    return;
                 }
+
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Reserva creada con éxito");

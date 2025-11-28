@@ -31,7 +31,7 @@
     <section class="flex flex-col items-center w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg mt-5 md:mt-0 md:ml-5">
         <h2 class="text-2xl font-bold mb-6 text-center text-[var(--azul-oscuro)]">Comprar Paquete</h2>
 
-        <form id="formCompraPaquete" class="space-y-4 flex flex-col items-center w-full">
+        <form id="formCompraPaquete" method="POST" class="space-y-4 flex flex-col items-center w-full">
 
             <!-- Seleccionar Paquete -->
             <div class="flex w-full md:w-1/2 items-center border-b border-gray-300 py-2 space-x-3 focus-within:border-[var(--azul-oscuro)]">
@@ -89,6 +89,11 @@
                 errorMsg.classList.remove('hidden');
             }
         })
+
+        formComprarPaquete.addEventListener('submit', (e) => {
+            const formData = new FormData(formComprarPaquete);
+            console.log("Valor paquete: ", formData.get("paquete"));
+        });
 </script>
 </body>
 </html>

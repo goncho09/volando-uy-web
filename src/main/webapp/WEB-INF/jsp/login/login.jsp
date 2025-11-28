@@ -9,6 +9,7 @@
 
     <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico?v=2" type="image/x-icon">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 <div class=" h-screen flex justify-center items-center bg-[var(--azul-oscuro)]">

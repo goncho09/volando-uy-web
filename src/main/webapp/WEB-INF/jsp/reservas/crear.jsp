@@ -216,24 +216,32 @@
 
             const formData = new FormData(formReserva);
             const encoded = new URLSearchParams(formData);
+
             errorMsg.textContent = '';
             errorMsg.classList.add('hidden');
             successMsg.classList.add('hidden');
 
+            try {
                 const response = await fetch('${pageContext.request.contextPath}/reservas/crear', {
                     method: 'POST',
                     body: encoded
                 });
-                const result = await response.json();
 
-                if (response.ok) {
-                    successMsg.classList.remove('hidden');
-                    formReserva.reset();
-                    generarCamposPasajeros();
-                } else {
-                    errorMsg.textContent = result.message || 'Error al crear la reserva.';
+                if (!response.ok) {
+                    const text = await response.text();
+                    errorMsg.textContent = text || 'Error al crear la reserva.';
                     errorMsg.classList.remove('hidden');
+                    return;
                 }
+
+                successMsg.classList.remove('hidden');
+                formReserva.reset();
+                generarCamposPasajeros();
+
+            } catch (err) {
+                errorMsg.textContent = 'Error de conexión.';
+                errorMsg.classList.remove('hidden');
+            }
         });
     });
 </script>

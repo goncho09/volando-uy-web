@@ -4,6 +4,7 @@ import uy.volando.soap.ControladorWS;
 import uy.volando.soap.client.*;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
+@MultipartConfig
 @WebServlet(name = "ComprarPaqueteServlet", urlPatterns = {"/paquete/comprar"})
 public class ComprarPaqueteServlet extends HttpServlet {
 
@@ -108,9 +110,9 @@ public class ComprarPaqueteServlet extends HttpServlet {
             DtCliente clienteLogueado = ws.getCliente(nicknameCliente);
             DtPaquete paqueteSelect = ws.getPaquete(paqueteNombre);
 
-            if (paqueteSelect == null) {
+            if (paqueteSelect == null || ws.estaPaqueteComprado(paqueteSelect)) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write("El paquete seleccionado no existe.");
+                response.getWriter().write("El paquete seleccionado no existe o ya fue comprado.");
                 return;
             }
 
@@ -125,7 +127,7 @@ public class ComprarPaqueteServlet extends HttpServlet {
         } catch (Exception ex) {
             System.out.println("Error en ComprarPaqueteServlet (POST): " + ex.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Error del servidor");
+            response.getWriter().write(ex.getMessage());
         }
     }
 }
