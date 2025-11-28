@@ -33,7 +33,6 @@ public class CrearReservaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-
         HttpSession session = request.getSession(false);
 
         Boolean esMobile = (Boolean) session.getAttribute("esMobile");

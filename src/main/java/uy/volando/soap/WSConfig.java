@@ -1,7 +1,5 @@
 package uy.volando.soap;
 
-import uy.volando.soap.VolandoConfig;
-
 import javax.servlet.ServletContext;
 
 public class WSConfig {
