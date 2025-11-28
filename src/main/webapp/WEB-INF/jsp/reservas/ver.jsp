@@ -62,7 +62,7 @@
                             <td class="px-4 py-2 text-center">${reserva.metodoPago}</td>
 
                             <c:if test="${usuarioTipo != null && usuarioTipo == 'aerolinea'}">
-                                <th class="px-4 py-2 text-center">${reserva.cliente}</th>
+                                <th class="px-4 py-2 text-center">${reserva.cliente.nombre}</th>
                             </c:if>
 
                             <td class="text-center px-4 py-2" onclick="event.stopPropagation();">
