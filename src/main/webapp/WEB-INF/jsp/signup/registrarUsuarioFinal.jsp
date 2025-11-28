@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volando.uy | Registrar usuario</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico?v=2" type="image/x-icon">
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css">
 </head>
@@ -142,5 +142,4 @@
         }
     });
 </script>
-
 </html>

@@ -2,9 +2,30 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutas de vuelo</title>
+
+    <!-- Tailwind CDN (forma correcta 2025) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Tus estilos personalizados -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+    <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" type="image/x-icon">
+    <!-- Variables de color (si no están en globals.css) -->
+    <style>
+        :root {
+            --azul-oscuro: #0c2636;
+            --azul-medio: #12445d;
+            --azul-claro: #1d6e86;
+            --celeste: #269fb8;
+            --celeste-claro: #2bc8c8;
+        }
+    </style>
 </head>
 
 <header id="header" class="flex flex-col px-4 py-2 text-white w-[100vw] bg-[var(--azul-oscuro)]">
@@ -195,7 +216,6 @@
     </nav>
 
 </header>
-
 <script defer>
 
     /* DESKTOP DROPDOWNS */
