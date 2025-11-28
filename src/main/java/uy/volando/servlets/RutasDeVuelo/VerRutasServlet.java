@@ -25,7 +25,6 @@ public class VerRutasServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-
         HttpSession session = request.getSession(false);
 
         if (session.getAttribute("usuarioTipo") == null || session.getAttribute("usuarioNickname") == null) {
@@ -34,6 +33,14 @@ public class VerRutasServlet extends HttpServlet {
         }
 
         if (!session.getAttribute("usuarioTipo").equals("aerolinea")) {
+            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
+            return;
+        }
+
+        Boolean esMobile = (Boolean) session.getAttribute("esMobile");
+
+        if (esMobile) {
+            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
             request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
             return;
         }

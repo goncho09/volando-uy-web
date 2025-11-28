@@ -49,7 +49,6 @@ public class HomeServlet extends HttpServlet {
             List<ListaResultados> resultados = new ArrayList<>();
 
             String contextPath = request.getContextPath();
-            String basePathRutas = getServletContext().getRealPath("/pictures/rutas");
 
 
             if (busqueda != null && !busqueda.isEmpty()) {
@@ -74,15 +73,14 @@ public class HomeServlet extends HttpServlet {
                     for (DtRuta ruta : rutas) {
 
                         String urlImagen = ruta.getUrlImagen();
-                        File rutaImg = (urlImagen != null && !urlImagen.isEmpty())
-                                ? new File(basePathRutas, urlImagen)
-                                : null;
+                        boolean invalida = (urlImagen == null || urlImagen.isEmpty());
 
-                        if (urlImagen == null || urlImagen.isEmpty() || rutaImg == null || !rutaImg.exists()) {
+                        if (invalida) {
                             ruta.setUrlImagen(contextPath + "/assets/rutaDefault.png");
                         } else {
-                            ruta.setUrlImagen(contextPath + "/pictures/rutas/" + urlImagen);
+                            ruta.setUrlImagen(contextPath + "/imagen?nombre=" + urlImagen + "&tipo=Ruta");
                         }
+
                         resultados.add(new ListaResultados(
                                 ruta.getNombre(),
                                 "Ruta",
@@ -127,17 +125,14 @@ public class HomeServlet extends HttpServlet {
                     listaRuta.removeIf(r -> !ws.rutaContieneCategoria(r, nombreFiltro));
                 }
 
-                // Setear imágenes
                 for (DtRuta r : listaRuta) {
                     String urlImagen = r.getUrlImagen();
-                    File rutaImg = (urlImagen != null && !urlImagen.isEmpty())
-                            ? new File(basePathRutas, urlImagen)
-                            : null;
+                    boolean invalida = (urlImagen == null || urlImagen.isEmpty());
 
-                    if (urlImagen == null || urlImagen.isEmpty() || rutaImg == null || !rutaImg.exists()) {
+                    if (invalida) {
                         r.setUrlImagen(contextPath + "/assets/rutaDefault.png");
                     } else {
-                        r.setUrlImagen(contextPath + "/pictures/rutas/" + urlImagen);
+                        r.setUrlImagen(contextPath + "/imagen?nombre=" + urlImagen + "&tipo=Ruta");
                     }
                 }
 
