@@ -9,8 +9,9 @@
     <title>Volando.uy | Ver rutas</title>
 
     <!-- Librerias Header -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
+    <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico?v=2" type="image/x-icon">
 
 </head>
 

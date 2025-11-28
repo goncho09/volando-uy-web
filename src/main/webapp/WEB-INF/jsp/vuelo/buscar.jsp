@@ -8,9 +8,8 @@
     <title>Volando.uy | Buscar vuelo</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/globals.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-<body>
+    <script src="https://cdn.tailwindcss.com"></script><body>
+    <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico?v=2" type="image/x-icon">
 
 <jsp:include page="../components/header.jsp"/>
 

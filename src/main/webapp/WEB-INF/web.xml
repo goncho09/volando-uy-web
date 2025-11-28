@@ -28,4 +28,8 @@
             <secure>false</secure>
         </cookie-config>
     </session-config>
+    <icon>
+        <small-icon>/favicon.ico</small-icon>
+        <large-icon>/favicon.ico</large-icon>
+    </icon>
 </web-app>
