@@ -39,12 +39,6 @@ public class PerfilServlet extends HttpServlet {
                         userAgent.contains("iPad")
         );
 
-        if (esMobile) {
-            request.setAttribute("error", "Acceso no autorizado desde dispositivos móviles.");
-            request.getRequestDispatcher("/WEB-INF/jsp/401.jsp").forward(request, response);
-            return;
-        }
-
         HttpSession session = request.getSession(false);
         String nickname = request.getParameter("nickname");
 
@@ -74,12 +68,12 @@ public class PerfilServlet extends HttpServlet {
                 String userNickname = (String) session.getAttribute("usuarioNickname");
                 DtUsuario user = ws.getUsuario(userNickname);
                 for (DtUsuario u : user.getSeguidos()) {
-                    if (u.getNickname().equals(nickname)) {
+                    if (u.getNickname().equals(nickname) && !esMobile) {
                         sigue = true;
                         break;
                     }
                 }
-                if (userNickname.equals(nickname)) {
+                if (userNickname.equals(nickname) && !esMobile) {
                     modificar = true;
                 }
             }
@@ -102,6 +96,7 @@ public class PerfilServlet extends HttpServlet {
             request.setAttribute("usuarioPerfil", usuario);
             request.setAttribute("modificar", modificar);
             request.setAttribute("sigue",sigue);
+            request.setAttribute("movil",esMobile);
 
             request.getRequestDispatcher("/WEB-INF/jsp/perfil/perfil.jsp").forward(request, response);
         } catch (Exception e) {

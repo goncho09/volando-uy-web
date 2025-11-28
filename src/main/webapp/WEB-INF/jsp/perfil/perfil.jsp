@@ -33,7 +33,7 @@
                         class="text-3xl fa fa-edit text-green-500 cursor-pointer hover:text-green-700"></i></button>
             </c:if>
 
-            <c:if test="${usuarioNickname != null && modificar != true && sigue == false}">
+            <c:if test="${usuarioNickname != null && modificar != true && sigue == false && !movil}">
                 <form id="seguir-usuario">
                 <button
                         type="submit"
@@ -43,7 +43,7 @@
                 </form>
             </c:if>
 
-            <c:if test="${usuarioNickname != null && modificar != true && sigue == true}">
+            <c:if test="${usuarioNickname != null && modificar != true && sigue == true && !movil}">
                 <form id="dejar-de-seguir-usuario">
                     <button
                             type="submit"
@@ -158,7 +158,7 @@
 
                             </div>
 
-                            <c:if test="${modificar == true}">
+                            <c:if test="${modificar == true || movil}">
                                 <div class="flex space-x-3">
                                     <button type="button"
                                             onclick="window.location.href='${pageContext.request.contextPath}/reservas/ver'"
