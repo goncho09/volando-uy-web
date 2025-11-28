@@ -120,6 +120,40 @@
                     </div>
                 </c:if>
 
+               <!-- FILTRO POR AEROLÍNEA -->
+               <c:if test="${not empty listaAerolineas}">
+                   <div class="menu-section mt-4 border-t border-gray-500 pt-3">
+
+                       <button class="menu-title flex items-center justify-between w-full">
+                           Aerolíneas
+                           <i class="fa-solid fa-chevron-down text-xs"></i>
+                       </button>
+
+                       <ul class="submenu hidden pl-4 transition-all duration-200">
+
+                           <!-- Todas -->
+                           <li class="py-2">
+                               <a class="block py-2"
+                                  href="${pageContext.request.contextPath}/home">
+                                   Todas
+                               </a>
+                           </li>
+
+                           <!-- Aerolíneas -->
+                           <c:forEach var="aero" items="${listaAerolineas}">
+                               <li class="py-2">
+                                   <a class="block py-2"
+                                      href="${pageContext.request.contextPath}/home?airline=${aero}">
+                                       ${aero}
+                                   </a>
+                               </li>
+                           </c:forEach>
+
+                       </ul>
+                   </div>
+               </c:if>
+
+
             </div>
         </div>
 
