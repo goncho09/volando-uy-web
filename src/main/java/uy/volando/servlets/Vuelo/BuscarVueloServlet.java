@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import uy.volando.soap.ControladorWS;
 import uy.volando.soap.client.*;
 
-import java.io.IOException;
+        import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -66,7 +66,12 @@ public class BuscarVueloServlet extends HttpServlet {
                 request.setAttribute("rutas", aerolinea.getRutasDeVuelo());
 
                 LocalDate fechaVuelo = fecha != null && !fecha.isEmpty() ? LocalDate.parse(fecha) : null;
-                List<DtVuelo> vuelos = ws.listarVuelosRutaFecha(idRuta, fechaVuelo.toString());
+                List<DtVuelo> vuelos;
+                if (fechaVuelo != null) {
+                    vuelos = ws.listarVuelosRutaFecha(idRuta, fechaVuelo.toString());
+                } else {
+                    vuelos = ws.listarVuelosRuta(idRuta);
+                }
                 request.setAttribute("vuelos", vuelos);
             }
 

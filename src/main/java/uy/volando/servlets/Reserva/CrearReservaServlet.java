@@ -279,8 +279,8 @@ public class CrearReservaServlet extends HttpServlet {
                 try {
                     ws.altaReserva(reserva);
                 } catch (ServerSOAPFaultException ex) {
-
-                    String msg = ex.getFault().getFaultString(); // mensaje real del SOAP Fault
+                    String msg = ex.getFault().getFaultString();
+                    System.err.println("SOAP Fault: " + msg);
 
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write(msg);
